@@ -248,12 +248,7 @@ const SidebarContent = ({
     [pathname]
   );
   return (
-    <div
-      className={cn(
-        "rounded-lg dark:bg-[#0C0C0C] h-full relative w-full",
-        container
-      )}
-    >
+    <div className={cn("rounded-lg h-full relative w-full", container)}>
       {headerContent}
       {SearchContent}
       <div
@@ -284,9 +279,9 @@ const SidebarContent = ({
                             variant: determineVariant(link.href),
                             size: "icon",
                           }),
-                          "h-9 w-9",
+                          "h-9 w-9 hover:bg-primary/10 text-neutral-400 hover:text-white",
                           determineVariant(link.href) === "default" &&
-                            "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white",
+                            "text-primary hover:text-primary",
                           link.className
                         )}
                       >
@@ -298,7 +293,7 @@ const SidebarContent = ({
                   {link.subLinks && (
                     <DropdownMenuContent
                       className={cn(
-                        "w-56 dark:bg-[#1B1B1B] border-0 outline-0",
+                        "w-56 dark:bg-[#1b1816] border-0 outline-0",
                         isCollapsed && "relative",
                         "left-4"
                       )}
@@ -315,9 +310,9 @@ const SidebarContent = ({
                                   variant: subItem.variant || "ghost",
                                   size: "sm",
                                 }),
-                                "flex items-center text-xs justify-start w-full hover:dark:!bg-neutral-900",
+                                "flex items-center text-xs justify-start w-full hover:bg-primary/10 text-neutral-400 hover:text-white",
                                 subItem.variant === "default" &&
-                                  "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white",
+                                  "text-primary hover:text-primary",
                                 subItem.className
                               )}
                             >
@@ -392,8 +387,9 @@ const SidebarContent = ({
                                 variant: determineVariant(link.href) || "ghost",
                                 size: "sm",
                               }),
+                              "justify-start w-full hover:bg-primary/10 text-neutral-400 hover:text-white",
                               determineVariant(link.href) === "default" &&
-                                "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white",
+                                "text-primary hover:text-primary",
                               "justify-start w-full",
                               link.className
                             )}
@@ -415,9 +411,9 @@ const SidebarContent = ({
                                         variant: subItem.variant || "ghost",
                                         size: "sm",
                                       }),
-                                      "flex items-center text-xs justify-start",
+                                      "flex items-center text-xs justify-start hover:bg-primary/10 text-neutral-400 hover:text-white",
                                       subItem.variant === "default" &&
-                                        "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white",
+                                        "text-primary hover:text-primary",
                                       subItem.className
                                     )}
                                   >
@@ -477,9 +473,9 @@ const SidebarContent = ({
                           variant: determineVariant(link.href),
                           size: "sm",
                         }),
+                        "justify-start w-full hover:bg-primary/10 text-neutral-400 hover:text-white",
                         determineVariant(link.href) === "default" &&
-                          "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white",
-                        "justify-start w-full",
+                          "text-primary hover:text-primary",
                         link.className
                       )}
                     >
@@ -489,8 +485,7 @@ const SidebarContent = ({
                         <span
                           className={cn(
                             "ml-auto",
-                            determineVariant(link.href) === "default" &&
-                              "text-background dark:text-white"
+                            determineVariant(link.href) === "default"
                           )}
                         >
                           {link.label}
@@ -791,15 +786,21 @@ const SidebarHeader = ({ logo, children, menuItems }: HeaderProps) => {
                     "flex w-full items-center justify-center p-0 px-1 h-full",
                     isCollapsed && "px-0"
                   )}
-                  onClick={()=>router.push('/')}
+                  onClick={() => router.push("/")}
                 >
-                  <div className={cn("flex gap-2 items-center cursor-pointer w-full h-full", isCollapsed && "justify-center")}>
+                  <div
+                    className={cn(
+                      "flex gap-2 items-center cursor-pointer w-full h-full",
+                      isCollapsed && "justify-center"
+                    )}
+                  >
                     {logo && (
                       <div className="flex items-center justify-center w-full h-full">
                         <span
                           className={cn(
                             "flex w-[40px] h-[40px] rounded-lg",
-                            isCollapsed && "w-full h-full justify-center items-center"
+                            isCollapsed &&
+                              "w-full h-full justify-center items-center"
                           )}
                         >
                           <Image
@@ -1008,7 +1009,10 @@ const Navigationbar = () => {
         <AnimatePresence>
           {activeLinkIndex !== null && (
             <motion.div
-              {...{className:"relative rounded-[inherit] backdrop-blur-md flex overflow-hidden dark:bg-neutral-900/70 w-full border-[1px]"}}
+              {...{
+                className:
+                  "relative rounded-[inherit] backdrop-blur-md flex overflow-hidden dark:bg-neutral-900/70 w-full border-[1px]",
+              }}
               initial={{ height: 0 }}
               animate={{ height: "auto" }}
               exit={{ height: 0 }}
@@ -1017,7 +1021,7 @@ const Navigationbar = () => {
             >
               <div className="p-1 w-full">
                 {links && links[activeLinkIndex].subLinks && (
-                  <motion.div {...{className:"flex flex-col w-full"}}>
+                  <motion.div {...{ className: "flex flex-col w-full" }}>
                     {links[activeLinkIndex].subLinks.map(
                       (subLink, subIndex) => (
                         <Button

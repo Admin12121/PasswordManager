@@ -2,6 +2,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
+import Spinner from "./spinner";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
@@ -9,7 +10,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow-sm shadow-black/5 hover:bg-primary/90",
+        default: "bg-primary/10 text-primary shadow-sm shadow-black/5 hover:bg-primary/90",
         destructive:
           "bg-destructive text-destructive-foreground shadow-sm shadow-black/5 hover:bg-destructive/90",
         outline:
@@ -37,13 +38,70 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  loading?: boolean;
+  icon?: React.ReactNode;
+  endContent?: React.ReactNode;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  (
+    {
+      className,
+      variant = "default",
+      size,
+      asChild = false,
+      children,
+      loading,
+      icon,
+      endContent,
+      onClick,
+      ...props
+    },
+    ref
+  ) => {
     const Comp = asChild ? Slot : "button";
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      const button = e.currentTarget;
+      const x = e.clientX - button.getBoundingClientRect().left;
+      const y = e.clientY - button.getBoundingClientRect().top;
+      const ripples = document.createElement("span");
+
+      ripples.style.cssText = `
+        left: ${x}px; 
+        top: ${y}px; 
+        position: absolute; 
+        transform: translate(-50%, -50%); 
+        pointer-events: none; 
+        border-radius: 50%; 
+        animation: ripple .8s linear infinite; 
+        transition: .5s;
+        ${
+          variant === "default"
+            ? "background: #000000bd"
+            : "background: rgba(255, 255, 255, 0.7)"
+        }`;
+      ripples.className = "ripple";
+      button.appendChild(ripples);
+      setTimeout(() => {
+        ripples.remove();
+      }, 800);
+
+      if (onClick) {
+        onClick(e);
+      }
+    };
     return (
-      <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
+      <Comp
+      className={cn(
+        "overflow-hidden relative",
+        buttonVariants({ variant, size, className })
+      )}
+      ref={ref}
+      onClick={handleClick}
+      {...props}
+    >
+      <>{loading ? <Spinner color="secondary" size="sm" /> : children}</>
+    </Comp>
     );
   },
 );

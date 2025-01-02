@@ -2,8 +2,8 @@ import { Metadata } from "next";
 import { FooterItem } from "./type";
 
 export const siteConfig = {
-  title: "Nepal Heritage Handicraft",
-  name: "Heritage Craft",
+  title: "Password Manager",
+  name: "Password Manager",
   shortName: "NHH",
   url: "https://ecom.biki.com.np",
   ogImage: "https://ecom.biki.com.np/og.jpg",
