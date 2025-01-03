@@ -1,4 +1,4 @@
-import Providers from "./providers";
+import Providers from "./_components/providers";
 
 export default async function RootLayout({
   children,

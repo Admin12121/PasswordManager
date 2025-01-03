@@ -51,6 +51,7 @@ import {
 interface SidebarProps {
   navCollapsedSize?: number;
   children: React.ReactNode;
+  className?: string;
 }
 
 interface SidebarContextType {
@@ -64,7 +65,11 @@ const SidebarContext = React.createContext<SidebarContextType | undefined>(
   undefined
 );
 
-const Sidebar = ({ navCollapsedSize = 4, children }: SidebarProps) => {
+const Sidebar = ({
+  navCollapsedSize = 4,
+  children,
+  className,
+}: SidebarProps) => {
   const layout = getCookie("react-resizable-panels:layout:mail");
   const collapsed = getCookie("react-resizable-panels:collapsed");
   const defaultLayout = layout ? JSON.parse(layout) : [20, 80];
@@ -140,9 +145,10 @@ const Sidebar = ({ navCollapsedSize = 4, children }: SidebarProps) => {
                 )}`;
               }}
               className={cn(
-                "p-2 max-md:hidden h-[100dvh] min-w-[170px]",
+                "max-md:hidden h-[100dvh] min-w-[170px]",
                 isCollapsed &&
-                  "min-w-[68px] transition-all duration-300 ease-in-out"
+                  "min-w-[68px] transition-all duration-300 ease-in-out",
+                className
               )}
             >
               {sidebarNav.nav}
@@ -177,7 +183,7 @@ interface Sublink {
   menu?: SublinkMenu[];
 }
 
-interface SidebarNavProps {
+export interface SidebarNavProps {
   links: {
     group?: string;
     title: string;
@@ -248,13 +254,13 @@ const SidebarContent = ({
     [pathname]
   );
   return (
-    <div className={cn("rounded-lg h-full relative w-full", container)}>
+    <div className={cn("rounded-lg h-full relative w-full ", container)}>
       {headerContent}
       {SearchContent}
       <div
         data-collapsed={isCollapsed}
         className={cn(
-          "group flex flex-col gap-4 data-[collapsed=true]:py-2 w-full overflow-hidden overflow-y-auto",
+          "group flex flex-col gap-4 data-[collapsed=true]:py-2 w-full overflow-hidden overflow-y-auto data-[collapsed=false]:mt-3",
           {
             "h-[calc(100dvh-80px)]": !headerContent,
             "h-[calc(100dvh-70px)]": headerContent && !footerContent,
@@ -279,7 +285,7 @@ const SidebarContent = ({
                             variant: determineVariant(link.href),
                             size: "icon",
                           }),
-                          "h-9 w-9 hover:bg-primary/10 text-neutral-400 hover:text-white",
+                          "h-9 w-9 hover:bg-primary/10 dark:text-neutral-400  dark:hover:text-white",
                           determineVariant(link.href) === "default" &&
                             "text-primary hover:text-primary",
                           link.className
@@ -310,7 +316,7 @@ const SidebarContent = ({
                                   variant: subItem.variant || "ghost",
                                   size: "sm",
                                 }),
-                                "flex items-center text-xs justify-start w-full hover:bg-primary/10 text-neutral-400 hover:text-white",
+                                "flex items-center text-xs justify-start w-full hover:bg-primary/10 dark:text-neutral-400 dark:hover:text-white",
                                 subItem.variant === "default" &&
                                   "text-primary hover:text-primary",
                                 subItem.className
@@ -387,7 +393,7 @@ const SidebarContent = ({
                                 variant: determineVariant(link.href) || "ghost",
                                 size: "sm",
                               }),
-                              "justify-start w-full hover:bg-primary/10 text-neutral-400 hover:text-white",
+                              "justify-start w-full hover:bg-primary/10 dark:text-neutral-400 dark:hover:text-white",
                               determineVariant(link.href) === "default" &&
                                 "text-primary hover:text-primary",
                               "justify-start w-full",
@@ -411,7 +417,7 @@ const SidebarContent = ({
                                         variant: subItem.variant || "ghost",
                                         size: "sm",
                                       }),
-                                      "flex items-center text-xs justify-start hover:bg-primary/10 text-neutral-400 hover:text-white",
+                                      "flex items-center text-xs justify-start hover:bg-primary/10 dark:text-neutral-400 dark:hover:text-white",
                                       subItem.variant === "default" &&
                                         "text-primary hover:text-primary",
                                       subItem.className
@@ -473,7 +479,7 @@ const SidebarContent = ({
                           variant: determineVariant(link.href),
                           size: "sm",
                         }),
-                        "justify-start w-full hover:bg-primary/10 text-neutral-400 hover:text-white",
+                        "justify-start w-full hover:bg-primary/10 text-foreground/70 hover:text-foreground ",
                         determineVariant(link.href) === "default" &&
                           "text-primary hover:text-primary",
                         link.className
@@ -753,7 +759,7 @@ interface HeaderProps {
   children?: React.ReactNode;
 }
 
-const SidebarHeader = ({ logo, children, menuItems }: HeaderProps) => {
+const SidebarHeader = ({ logo, children, menuItems, label }: HeaderProps) => {
   const router = useRouter();
   const context = React.useContext(SidebarContext);
 
@@ -768,7 +774,7 @@ const SidebarHeader = ({ logo, children, menuItems }: HeaderProps) => {
         children
       ) : (
         <div
-          className={cn("relative flex h-[52px] items-center justify-center")}
+          className={cn("relative flex h-[52px] items-center justify-center border-b")}
         >
           <div
             className={cn(
@@ -795,35 +801,28 @@ const SidebarHeader = ({ logo, children, menuItems }: HeaderProps) => {
                     )}
                   >
                     {logo && (
-                      <div className="flex items-center justify-center w-full h-full">
-                        <span
-                          className={cn(
-                            "flex w-[40px] h-[40px] rounded-lg",
-                            isCollapsed &&
-                              "w-full h-full justify-center items-center"
-                          )}
-                        >
-                          <Image
-                            src={logo || ""}
-                            alt="Nepal Heritage Handicraft Logo"
-                            priority
-                            width={100}
-                            height={100}
-                            className="object-contain"
-                          />
-                        </span>
+                      <div className="flex items-center w-full h-full gap-2">
+                        {isCollapsed && (
+                          <span
+                            className={cn(
+                              "flex w-[40px] h-[40px] rounded-lg overflow-hidden",
+                              isCollapsed &&
+                                "w-full h-full justify-center items-center"
+                            )}
+                          >
+                            <Image
+                              src={logo || ""}
+                              alt="logo"
+                              priority
+                              width={100}
+                              height={100}
+                              className="object-contain"
+                            />
+                          </span>
+                        )}
+                        {!isCollapsed && <h1 className="text-2xl">{label}</h1>}
                       </div>
                     )}
-                    {/* <h1
-                      className={cn(
-                        "font-semibold",
-                        !logo && "px-2",
-                        !logo && isCollapsed && "text-2xl !m-0"
-                      )}
-                      style={{ fontFamily: "var(--font-geist-mono)" }}
-                    >
-                      {label && isCollapsed ? `${label.slice(0, 1)}` : label}
-                    </h1> */}
                     {menuItems && menuItems.length > 0 && (
                       <ChevronsUpDown className="w-4 h-4 absolute right-3" />
                     )}
@@ -894,87 +893,89 @@ const SidebarFooter = ({
   }
 
   if (children) {
-    return <div className={cn("absolute bottom-0", className)}>{children}</div>;
+    return (
+      <div className={cn("absolute bottom-0 w-full", className)}>
+        {children}
+      </div>
+    );
   }
 
   const { isCollapsed } = context;
   return (
-    <>
-      <div
-        className={cn(
-          "flex h-[52px] items-center justify-center bottom-1 absolute w-full backdrop-blur-md",
-          isCollapsed ? "h-[52px]" : "px-2"
-        )}
-      >
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="secondary"
-              className={cn(
-                "relative h-11 w-full p-1 rounded-md flex items-center justify-start",
-                isCollapsed && "h-9 w-9 p-0 justify-center"
-              )}
-            >
-              <div className="flex items-center space-x-4">
-                <Avatar
-                  className={cn(
-                    "h-9 w-9 rounded-md bg-white",
-                    isCollapsed && "h-8 w-8 p-0"
-                  )}
-                >
-                  <AvatarImage src="/logo.png" />
-                  <AvatarFallback className="bg-transparent">OM</AvatarFallback>
-                </Avatar>
-                <div
-                  className={cn(
-                    "flex items-start justify-start flex-col",
-                    isCollapsed && "hidden"
-                  )}
-                >
-                  <p className="text-sm font-medium text-muted-foreground leading-none">
-                    {data?.name}
-                  </p>
-                  <p className="text-xs text-zinc-600">{data?.email}</p>
-                </div>
-                {menuItems.length > 0 && (
-                  <ChevronsUpDown className="w-4 h-4 absolute right-3" />
+    <div
+      className={cn(
+        "flex h-[52px] items-center justify-center bottom-1 absolute w-full backdrop-blur-md",
+        isCollapsed ? "h-[52px]" : "px-2"
+      )}
+    >
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="secondary"
+            className={cn(
+              "relative h-11 w-full p-1 rounded-md flex items-center justify-start",
+              isCollapsed && "h-9 w-9 p-0 justify-center"
+            )}
+          >
+            <div className="flex items-center space-x-4">
+              <Avatar
+                className={cn(
+                  "h-9 w-9 rounded-md bg-white",
+                  isCollapsed && "h-8 w-8 p-0"
                 )}
+              >
+                <AvatarImage src="/logo.png" />
+                <AvatarFallback className="bg-transparent">OM</AvatarFallback>
+              </Avatar>
+              <div
+                className={cn(
+                  "flex items-start justify-start flex-col",
+                  isCollapsed && "hidden"
+                )}
+              >
+                <p className="text-sm font-medium text-muted-foreground leading-none">
+                  {data?.name}
+                </p>
+                <p className="text-xs text-zinc-600">{data?.email}</p>
               </div>
-            </Button>
-          </DropdownMenuTrigger>
-          {menuItems.length > 0 && (
-            <DropdownMenuContent
-              className={cn(
-                "w-56 dark:bg-muted border-0 outline-0",
-                isCollapsed && "relative",
-                left ? "left-4" : "-top-2"
+              {menuItems.length > 0 && (
+                <ChevronsUpDown className="w-4 h-4 absolute right-3" />
               )}
-              align="end"
-              forceMount
-            >
-              <DropdownMenuGroup>
-                {menuItems.map((item, index) => (
-                  <DropdownMenuItem
-                    key={index}
-                    className="gap-2 hover:dark:!bg-neutral-900"
-                    onClick={() => {
-                      if (item.href) {
-                        router.push(item.href);
-                      } else if (item.onClick) {
-                        item.onClick();
-                      }
-                    }}
-                  >
-                    {item.icon && <item.icon className="w-4 h-4" />}
-                    {item.title}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          )}
-        </DropdownMenu>
-      </div>
-    </>
+            </div>
+          </Button>
+        </DropdownMenuTrigger>
+        {menuItems.length > 0 && (
+          <DropdownMenuContent
+            className={cn(
+              "w-56 dark:bg-muted border-0 outline-0",
+              isCollapsed && "relative",
+              left ? "left-4" : "-top-2"
+            )}
+            align="end"
+            forceMount
+          >
+            <DropdownMenuGroup>
+              {menuItems.map((item, index) => (
+                <DropdownMenuItem
+                  key={index}
+                  className="gap-2 hover:dark:!bg-neutral-900"
+                  onClick={() => {
+                    if (item.href) {
+                      router.push(item.href);
+                    } else if (item.onClick) {
+                      item.onClick();
+                    }
+                  }}
+                >
+                  {item.icon && <item.icon className="w-4 h-4" />}
+                  {item.title}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        )}
+      </DropdownMenu>
+    </div>
   );
 };
 

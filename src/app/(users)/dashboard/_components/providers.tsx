@@ -5,11 +5,12 @@ import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
+  SidebarFooter,
 } from "@/components/global/sidebar";
 import { Links } from "./links";
 import { cn } from "@/lib/utils";
-import Header from "./_components/header";
-import { siteConfig } from "@/config/site";
+import Header from "./header";
+import ThemeSwitcher from "@/components/global/theme-switch";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -17,9 +18,14 @@ interface ProvidersProps {
 
 const Providers = ({ children }: ProvidersProps) => {
   return (
-    <Sidebar>
-      <SidebarContent container="!bg-transparent" links={Links}>
-        <SidebarHeader logo="/logo.png" label={siteConfig.name} />
+    <Sidebar className="border-r">
+      <SidebarContent container="!bg-transparent p-2" links={Links}>
+        <SidebarHeader logo="/logo.svg" label="Password Manager" />
+        <SidebarFooter className="border-t left-0">
+          <div className="flex flex-row items-center p-2 w-full">
+            <ThemeSwitcher/>
+          </div>
+        </SidebarFooter>
       </SidebarContent>
       <main className="h-svh p-2 w-full">
         <div
@@ -29,7 +35,7 @@ const Providers = ({ children }: ProvidersProps) => {
             "rounded-xl overflow-y-auto"
           )}
         >
-          <Header/>
+          <Header />
           {children}
         </div>
       </main>
