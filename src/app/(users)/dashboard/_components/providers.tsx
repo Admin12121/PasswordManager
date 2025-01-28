@@ -10,20 +10,26 @@ import {
 import { Links } from "./links";
 import { cn } from "@/lib/utils";
 import Header from "./header";
-import ThemeSwitcher from "@/components/global/theme-switch";
+import dynamic from "next/dynamic";
+
+const ThemeSwitch = dynamic(() => import("@/components/global/theme-switch"), {
+  ssr: false,
+});
 
 interface ProvidersProps {
   children: React.ReactNode;
+  collapsed?: string;
+  layout?: string;
 }
 
-const Providers = ({ children }: ProvidersProps) => {
+const Providers = ({ children, collapsed, layout }: ProvidersProps) => {
   return (
-    <Sidebar className="border-r">
+    <Sidebar layout={layout} collapsed={collapsed} className="border-r">
       <SidebarContent container="!bg-transparent p-2" links={Links}>
-        <SidebarHeader logo="/logo.svg" label="Password Manager" />
+        <SidebarHeader logo="/profile.png" label="Password Manager" />
         <SidebarFooter className="border-t left-0">
           <div className="flex flex-row items-center p-2 w-full">
-            <ThemeSwitcher/>
+            <ThemeSwitch />
           </div>
         </SidebarFooter>
       </SidebarContent>

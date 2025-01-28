@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Kbd from "@/components/ui/kbd";
 import { Slot } from "@radix-ui/react-slot";
-import { cn, getCookie } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -52,6 +52,8 @@ interface SidebarProps {
   navCollapsedSize?: number;
   children: React.ReactNode;
   className?: string;
+  layout?: string;
+  collapsed?: string;
 }
 
 interface SidebarContextType {
@@ -66,12 +68,12 @@ const SidebarContext = React.createContext<SidebarContextType | undefined>(
 );
 
 const Sidebar = ({
+  layout,
+  collapsed,
   navCollapsedSize = 4,
   children,
   className,
 }: SidebarProps) => {
-  const layout = getCookie("react-resizable-panels:layout:mail");
-  const collapsed = getCookie("react-resizable-panels:collapsed");
   const defaultLayout = layout ? JSON.parse(layout) : [20, 80];
   const defaultCollapsed = collapsed ? JSON.parse(collapsed) : false;
 
@@ -127,7 +129,7 @@ const Sidebar = ({
         >
           {sidebarNav.nav && (
             <ResizablePanel
-              defaultSize={defaultLayout[0]}
+              defaultSize={defaultLayout[0] || 20}
               collapsedSize={navCollapsedSize}
               collapsible={true}
               minSize={15}
@@ -157,7 +159,7 @@ const Sidebar = ({
           {sidebarNav.nav && (
             <ResizableHandle className="bg-transparent w-2 max-md:hidden" />
           )}
-          <ResizablePanel>
+          <ResizablePanel defaultSize={defaultLayout[1] || 80}>
             {sidebarNav.content}
             <Navigationbar />
           </ResizablePanel>
@@ -291,7 +293,7 @@ const SidebarContent = ({
                           link.className
                         )}
                       >
-                        {link.icon && <link.icon className="h-4 w-4" />}
+                        {link.icon && <link.icon className="h-4 w-4 !mr-0" />}
                         <span className="sr-only">{link.title}</span>
                       </Link>
                     </TooltipTrigger>
@@ -774,7 +776,9 @@ const SidebarHeader = ({ logo, children, menuItems, label }: HeaderProps) => {
         children
       ) : (
         <div
-          className={cn("relative flex h-[52px] items-center justify-center border-b")}
+          className={cn(
+            "relative flex h-[52px] items-center justify-center border-b"
+          )}
         >
           <div
             className={cn(

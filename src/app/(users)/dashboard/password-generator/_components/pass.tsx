@@ -1,5 +1,3 @@
-// Dependencies: pnpm install lucide-react
-
 "use client";
 
 import { Input } from "@/components/ui/input";

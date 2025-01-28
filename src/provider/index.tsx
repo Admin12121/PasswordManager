@@ -17,8 +17,8 @@ export const Provider = ({ children, ...props }: ThemeProviderProps) => {
     <NextThemesProvider
       {...props}
       attribute="class"
+      enableSystem={true}
       defaultTheme="dark"
-      enableSystem
       disableTransitionOnChange
     >
       <Toaster
@@ -32,3 +32,5 @@ export const Provider = ({ children, ...props }: ThemeProviderProps) => {
     </NextThemesProvider>
   );
 };
+
+export default Provider;

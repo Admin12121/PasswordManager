@@ -1,0 +1,110 @@
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
+const createHeaders = (
+  token?: string,
+  contentType: string = "application/json"
+) => {
+  const headers: HeadersInit = { "Content-type": contentType };
+  if (token) {
+    headers["authorization"] = `Bearer ${token}`;
+  }
+  return headers;
+};
+
+const buildQueryParams = (
+  params: Record<string, string | number | string[] | undefined>
+) => {
+  const queryParams = Object.entries(params)
+    .filter(
+      ([_, value]) => value !== undefined && value !== null && value !== "" && value !== 0 && !(Array.isArray(value) && value.length === 0)
+    )
+    .map(([key, value]) => `${key}=${(value)}`)
+    .join("&");
+  return queryParams ? `?${queryParams}` : "";
+};
+
+export const userAuthapi = createApi({
+  reducerPath: "userAuthapi",
+  baseQuery: fetchBaseQuery({
+    baseUrl: `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}`,
+  }),
+  tagTypes: ["LoggedUser"],
+  endpoints: (builder) => ({
+    userDevice: builder.mutation({
+      query: (user) => ({
+        url: "api/accounts/users/device/",
+        method: "POST",
+        body: user,
+        headers: createHeaders(),
+      }),
+    }),
+    allUsers: builder.query({
+      query: ({ username, search, rowsperpage, page, exclude_by, token }) => {
+        return {
+          url: `api/accounts/admin-users/${
+            username ? `by-username/${username}/` : ""
+          }${buildQueryParams({
+            search,
+            page_size: rowsperpage,
+            page,
+            exclude_by,
+          })}`,
+          method: "GET",
+          headers: createHeaders(token),
+        };
+      },
+    }),
+    getLoggedUser: builder.query({
+      query: ({ token }) => ({
+        url: "api/accounts/users/me/",
+        method: "GET",
+        headers: createHeaders(token),
+      }),
+      providesTags: [{ type: "LoggedUser", id: "ME" }],
+      keepUnusedDataFor: Infinity,
+    }),
+    getUserProfile: builder.query({
+      query: ({ username }) => ({
+        url: `api/accounts/users/?name=${username}`,
+        method: "GET",
+        headers: createHeaders(),
+      }),
+    }),
+    updateUserProfile: builder.mutation({
+      query: ({ NewFormData, token }) => ({
+        url: `api/accounts/users/12/`,
+        method: "PATCH",
+        body: NewFormData,
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }),
+    }),
+    changeUserPassword: builder.mutation({
+      query: ({ actualData }) => ({
+        url: "api/accounts/changepassword/",
+        method: "POST",
+        body: actualData,
+        headers: createHeaders(),
+      }),
+    }),
+    refreshToken: builder.mutation({
+      query: (refreshToken) => ({
+        url: "api/accounts/token/refresh/",
+        method: "POST",
+        body: refreshToken,
+        headers: createHeaders(),
+      }),
+    }),
+  }),
+});
+
+export const {
+  useUserDeviceMutation,
+  useAllUsersQuery,
+  useGetLoggedUserQuery,
+  useGetUserProfileQuery,
+  useUpdateUserProfileMutation,
+  useChangeUserPasswordMutation,
+  useRefreshTokenMutation,
+} = userAuthapi;

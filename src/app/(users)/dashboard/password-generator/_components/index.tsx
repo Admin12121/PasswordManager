@@ -139,7 +139,7 @@ const PasswordGenerator = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 items-center justify-center h-full">
+    <div className="flex flex-col gap-4 p-5 h-full">
       <Pointer
         onClick={copyToClipboard}
         name={
@@ -199,7 +199,7 @@ const PasswordGenerator = () => {
           </motion.div>
         </span>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-4 max-w-[420px]">
         <Label>
           Length :{" "}
           <output className="text-sm font-medium tabular-nums">

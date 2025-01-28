@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import {
   Home,
   Settings,
@@ -9,7 +10,7 @@ import {
   KeyRound 
 } from "lucide-react";
 
-const Wallet = () => {
+const Wallet = ({className}:{className?:string}) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -17,7 +18,7 @@ const Wallet = () => {
       height="24px"
       viewBox="0 0 24 24"
       fill="none"
-      className="lucide lucide-user-round mr-2 h-4 w-4"
+      className={cn("lucide lucide-user-round mr-2 h-4 w-4", className)}
     >
       <path
         d="M6 8H10"
