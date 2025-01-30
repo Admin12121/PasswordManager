@@ -32,7 +32,7 @@ export const userAuthapi = createApi({
   endpoints: (builder) => ({
     userDevice: builder.mutation({
       query: (user) => ({
-        url: "api/accounts/users/device/",
+        url: "api/userauth/users/device/",
         method: "POST",
         body: user,
         headers: createHeaders(),
@@ -41,7 +41,7 @@ export const userAuthapi = createApi({
     allUsers: builder.query({
       query: ({ username, search, rowsperpage, page, exclude_by, token }) => {
         return {
-          url: `api/accounts/admin-users/${
+          url: `api/userauth/admin-users/${
             username ? `by-username/${username}/` : ""
           }${buildQueryParams({
             search,
@@ -56,7 +56,7 @@ export const userAuthapi = createApi({
     }),
     getLoggedUser: builder.query({
       query: ({ token }) => ({
-        url: "api/accounts/users/me/",
+        url: "api/userauth/users/profile/",
         method: "GET",
         headers: createHeaders(token),
       }),
@@ -65,14 +65,14 @@ export const userAuthapi = createApi({
     }),
     getUserProfile: builder.query({
       query: ({ username }) => ({
-        url: `api/accounts/users/?name=${username}`,
+        url: `api/userauth/users/?name=${username}`,
         method: "GET",
         headers: createHeaders(),
       }),
     }),
     updateUserProfile: builder.mutation({
       query: ({ NewFormData, token }) => ({
-        url: `api/accounts/users/12/`,
+        url: `api/userauth/users/12/`,
         method: "PATCH",
         body: NewFormData,
         headers: {
@@ -82,7 +82,7 @@ export const userAuthapi = createApi({
     }),
     changeUserPassword: builder.mutation({
       query: ({ actualData }) => ({
-        url: "api/accounts/changepassword/",
+        url: "api/userauth/changepassword/",
         method: "POST",
         body: actualData,
         headers: createHeaders(),
@@ -90,7 +90,7 @@ export const userAuthapi = createApi({
     }),
     refreshToken: builder.mutation({
       query: (refreshToken) => ({
-        url: "api/accounts/token/refresh/",
+        url: "api/userauth/token/refresh/",
         method: "POST",
         body: refreshToken,
         headers: createHeaders(),

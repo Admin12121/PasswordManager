@@ -22,7 +22,7 @@ export const protectedRoutes = [
 ];
 
 export const adminRoutes = [
-    "/dashboard",
+    // "/dashboard",
     "/users",
     "/users/(.*)",
     "/products",

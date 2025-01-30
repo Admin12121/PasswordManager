@@ -10,7 +10,7 @@ body {
   font-family: var(--font-geist-sans-medium);
   overflow-x: hidden;
   max-width: 100dvw;
-  background: hsl(var(--background));
+  /* background: hsl(var(--background)); */
 }
 
 @layer utilities {
@@ -74,7 +74,7 @@ body {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
   }
 }
 

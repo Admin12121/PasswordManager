@@ -11,6 +11,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens:{
+        'mac': "1360px"
+      },
       fontFamily: {
         sans: ["var(--font-sans)"],
         mono: ["var(--font-mono)"],

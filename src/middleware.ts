@@ -25,29 +25,29 @@ export default auth((req, ctx) => {
     isAdminRoute: isRouteMatch(adminRoutes),
   };
 
-  // if (routeType.isPublicRoute) {
-  //   return NextResponse.next();
-  // }
+  if (routeType.isPublicRoute) {
+    return NextResponse.next();
+  }
 
-  // if (routeType.isAuthRoute) {
-  //   return isLoggedIn
-  //     ? NextResponse.redirect(new URL(Default_Login_Redirect, req.url))
-  //     : NextResponse.next();
-  // }
+  if (routeType.isAuthRoute) {
+    return isLoggedIn
+      ? NextResponse.redirect(new URL(Default_Login_Redirect, req.url))
+      : NextResponse.next();
+  }
 
-  // if (routeType.isProtectedRoute) {
-  //   if (!isLoggedIn) {
-  //     return NextResponse.redirect(new URL("/auth/login", req.url));
-  //   }
-  //   if (routeType.isAdminRoute) {
-  //     const token = req.auth?.accessToken || "";
-  //     const decoded = decodeJwt(token);
-  //     if (decoded.role !== "Admin") {
-  //       return NextResponse.redirect(new URL("/", req.url));
-  //     }
-  //   }
-  //   return NextResponse.next();
-  // }
+  if (routeType.isProtectedRoute) {
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/auth/login", req.url));
+    }
+    if (routeType.isAdminRoute) {
+      const token = req.auth?.accessToken || "";
+      const decoded = decodeJwt(token);
+      if (decoded.role !== "Admin") {
+        return NextResponse.redirect(new URL("/", req.url));
+      }
+    }
+    return NextResponse.next();
+  }
 
   return NextResponse.next();
 });

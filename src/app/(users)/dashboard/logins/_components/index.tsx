@@ -25,14 +25,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 
-const MainTable = dynamic(() => import("@/components/global/table"), {ssr: false});
+const MainTable = dynamic(() => import("@/components/global/table"), {
+  ssr: false,
+});
 
 const statusOptions = [
   { name: "Published", uid: "i_published" },
   { name: "Draft", uid: "draft" },
-]
+];
 
-interface UserProps {
+interface SiteProps {
   avatarProps: {
     src: string;
     name: string;
@@ -53,20 +55,16 @@ interface UserProps {
 
 interface Users {
   id: number;
-  password: string;
-  email: string;
-  profile: string | null;
-  first_name: string;
-  last_name: string;
+  title: string;
+  website: string;
   username: string;
-  phone: string;
-  provider: string | null;
-  dob: string | null;
-  gender: string | null;
-  state: string;
+  password: string;
   created_at: string;
   updated_at: string;
-  last_login: string | null;
+  state: string;
+  note: string;
+  log: string;
+  security: boolean;
 }
 
 export const labels = [
@@ -84,7 +82,7 @@ export const labels = [
   },
 ];
 
-const User = ({ avatarProps, classNames, description, name }: UserProps) => {
+const Website = ({ avatarProps, classNames, description, name }: SiteProps) => {
   return (
     <div className={cn("flex gap-2", classNames?.base)}>
       <Avatar>
@@ -102,23 +100,20 @@ const User = ({ avatarProps, classNames, description, name }: UserProps) => {
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "email",
-  "phone",
-  "role",
-  "provider",
-  "state",
+  "website",
+  "username",
+  "password",
+  "updated_at",
   "actions",
 ];
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
-  { name: "USER", uid: "email", sortable: true },
-  { name: "PHONE", uid: "phone", sortable: true },
-  { name: "ROLE", uid: "role", sortable: true },
-  { name: "SOCIAL", uid: "provider", sortable: true },
-  { name: "GENDER", uid: "gender", sortable: true },
-  { name: "STATE", uid: "state", sortable: true },
-  { name: "ACTIONS", uid: "actions" },
+  { name: "Website", uid: "website", sortable: true },
+  { name: "Username", uid: "username", sortable: true },
+  { name: "Password", uid: "password", sortable: true },
+  { name: "Last Modified", uid: "updated_at", sortable: true },
+  { name: "Actions", uid: "actions" },
 ];
 
 export default function TaskPage() {
@@ -151,11 +146,11 @@ export default function TaskPage() {
       const cellValue = users[columnKey as keyof Users];
 
       switch (columnKey) {
-        case "email":
+        case "website":
           return (
-            <User
+            <Website
               avatarProps={{
-                src: users?.profile as string,
+                src: users?.website as string,
                 name: `${users.username.slice(0, 1)}`,
                 // icon: `${(<AvatarIcon />)}`,
                 classNames: {
@@ -167,25 +162,27 @@ export default function TaskPage() {
                 description: "text-default-500",
                 name: "cursor-pointer",
               }}
-              description={users.email}
-              name={`${users.username}`}
+              description={users.username}
+              name={`${users.title}`}
             />
           );
-        case "phone":
-          return (
-            <div className="flex flex-col">
-              <p className="text-bold text-small capitalize">{users.phone}</p>
-            </div>
-          );
-        case "gender":
+        case "username":
           return (
             <div className="flex flex-col">
               <p className="text-bold text-small capitalize">
-                {users.gender || ""}
+                {users.username}
               </p>
             </div>
           );
-        case "state":
+        case "password":
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-small capitalize">
+                {users.password || ""}
+              </p>
+            </div>
+          );
+        case "last Modified":
           return (
             <Chip
               className={`capitalize border-none gap-1 text-default-600`}
@@ -194,8 +191,6 @@ export default function TaskPage() {
               {users.state}
             </Chip>
           );
-        case "provider":
-          return <p>{users.provider || "default"}</p>;
         case "actions":
           return (
             <div className="relative flex items-center justify-center gap-2">
