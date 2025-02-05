@@ -1,101 +1,35 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { z } from "zod";
-import { Mail, Eye, EyeOff } from "lucide-react";
-import { ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Mail, Eye, EyeOff, KeyRound } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Blocks,
-  Brain,
-  Cpu,
-  Database,
-  Globe,
-  Layout,
-  LineChart,
-  Network,
-  Search,
-  Server,
-} from "lucide-react";
-
-const items = [
-  {
-    value: "analytics platform",
-    label: "Analytics Platform",
-    icon: LineChart,
-    number: 2451,
-  },
-  {
-    value: "ai services",
-    label: "AI Services",
-    icon: Brain,
-    number: 1832,
-  },
-  {
-    value: "database systems",
-    label: "Database Systems",
-    icon: Database,
-    number: 1654,
-  },
-  {
-    value: "compute resources",
-    label: "Compute Resources",
-    icon: Cpu,
-    number: 943,
-  },
-  {
-    value: "network services",
-    label: "Network Services",
-    icon: Network,
-    number: 832,
-  },
-  {
-    value: "web services",
-    label: "Web Services",
-    icon: Globe,
-    number: 654,
-  },
-  {
-    value: "monitoring tools",
-    label: "Monitoring Tools",
-    icon: Search,
-    number: 432,
-  },
-  {
-    value: "server management",
-    label: "Server Management",
-    icon: Server,
-    number: 321,
-  },
-  {
-    value: "infrastructure",
-    label: "Infrastructure",
-    icon: Blocks,
-    number: 234,
-  },
-  {
-    value: "frontend services",
-    label: "Frontend Services",
-    icon: Layout,
-    number: 123,
-  },
-];
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { toast } from "sonner";
+import { delay } from "@/lib/utils";
+import { useAuthUser } from "@/hooks/use-auth-user";
+import { usePostLoginsMutation } from "@/lib/store/api/api";
+import Options from "./options";
+import Spinner from "@/components/ui/spinner";
+import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
   title: z
@@ -118,173 +52,267 @@ const formSchema = z.object({
     .string()
     .max(500, { message: "Note must be less than 500 characters" })
     .optional(),
+  security: z.boolean().optional(),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
+const defaultFormValues: FormValues = {
+  title: "",
+  app: "",
+  username: "",
+  password: "",
+  note: "",
+  security: false,
+};
+
 const LoginForm = () => {
+  const { accessToken } = useAuthUser();
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [open, setOpen] = useState<boolean>(false);
-  const [value, setValue] = useState<string>("");
+  const [generatingpasswordLoader, setGeneratePassword] =
+    useState<boolean>(false);
+  const [addLogins] = usePostLoginsMutation();
 
   const toggleVisibility = () => setIsVisible((prevState) => !prevState);
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    mode: "onChange",
+    defaultValues: defaultFormValues,
+  });
+
+  const { reset, setValue } = form;
+
+  const onSubmit = useCallback(async (data: FormValues) => {
+    const toastId = toast.loading("Adding...", { position: "top-center" });
+    await delay(500);
+    console.log(data);
+    // const res = await addLogins({ actualData: data, token: accessToken });
+    // if ("data" in res) {
+    //   reset();
+    //   toast.success("Added successfully", {
+    //     id: toastId,
+    //     position: "top-center",
+    //   });
+    // } else {
+    //   toast.error("Something went wrong", {
+    //     id: toastId,
+    //     position: "top-center",
+    //   });
+    // }
+  }, []);
+
+  const generatePassword = () => {
+    setGeneratePassword(true);
+    const letters = "abcdefghijklmnopqrstuvwxyz";
+    const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numbers = "0123456789";
+    const symbols = "!@#$%^&*()_+[]{}|;:,.<>?";
+
+    let charPool = "";
+    charPool += letters;
+    charPool += upperCase;
+    charPool += numbers;
+    charPool += symbols;
+
+    if (!charPool) {
+      setValue("password", "");
+      return;
+    }
+
+    let newPassword = "";
+    for (let i = 0; i < 40; i++) {
+      const randomIndex = Math.floor(Math.random() * charPool.length);
+      newPassword += charPool[randomIndex];
+    }
+    setTimeout(() => {
+      setValue("password", newPassword);
+      setGeneratePassword(false);
+    }, 1000);
+  };
+
   return (
     <div className="flex gap-3 w-full items-center flex-col lg:flex-row ">
-      <form className="p-3 space-y-2 w-full">
-        <div className="space-y-2">
-          <Label htmlFor="input-01">Title</Label>
-          <Input id="input-01" placeholder="Email" type="email" />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="select-45">Website/App</Label>
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                id="select-45"
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                className="w-full justify-between bg-background px-3 font-normal outline-offset-0 hover:bg-background focus-visible:border-ring focus-visible:outline-[3px] focus-visible:outline-ring/20"
-              >
-                {value ? (
-                  <span className="flex min-w-0 items-center gap-2">
-                    {(() => {
-                      const selectedItem = items.find(
-                        (item) => item.value === value
-                      );
-                      if (selectedItem) {
-                        const Icon = selectedItem.icon;
-                        return (
-                          <Icon className="h-4 w-4 text-muted-foreground" />
-                        );
-                      }
-                      return null;
-                    })()}
-                    <span className="truncate">
-                      {items.find((item) => item.value === value)?.label}
-                    </span>
-                  </span>
-                ) : (
-                  <span className="text-muted-foreground">
-                    Select service category
-                  </span>
-                )}
-                <ChevronDown
-                  size={16}
-                  strokeWidth={2}
-                  className="shrink-0 text-muted-foreground/80"
-                  aria-hidden="true"
-                />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-full min-w-[var(--radix-popper-anchor-width)] border-input p-0"
-              align="start"
-            >
-              <Command>
-                <CommandInput placeholder="Search services..." />
-                <CommandList>
-                  <CommandEmpty>No service found.</CommandEmpty>
-                  <CommandGroup>
-                    {items.map((item) => (
-                      <CommandItem
-                        key={item.value}
-                        value={item.value}
-                        onSelect={(currentValue) => {
-                          setValue(currentValue === value ? "" : currentValue);
-                          setOpen(false);
-                        }}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-2">
-                          <item.icon className="h-4 w-4 text-muted-foreground" />
-                          {item.label}
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          {item.number.toLocaleString()}
-                        </span>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="input-10">Email</Label>
-          <div className="relative">
-            <Input
-              id="input-10"
-              className="peer pe-9"
-              placeholder="Email"
-              type="email"
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="p-3 space-y-2 w-full"
+        >
+          <div className="space-y-2">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input id="input-01" placeholder="Title" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            <div className="pointer-events-none absolute inset-y-0 end-0 flex items-center justify-center pe-3 text-muted-foreground/80 peer-disabled:opacity-50">
-              <Mail size={16} strokeWidth={2} aria-hidden="true" />
+          </div>
+          <div className="space-y-2">
+            <FormField
+              control={form.control}
+              name="app"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="select-45">Website/App</FormLabel>
+                  <FormControl>
+                    <Options
+                      value={field.value}
+                      setValue={(value) => setValue("app", value)}
+                      setTitle={(title) => setValue("title", title)}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="space-y-2">
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        id="input-10"
+                        className="peer pe-9"
+                        placeholder="vickytajpuriya@gmail.com"
+                        {...field}
+                      />
+                      <div className="pointer-events-none absolute inset-y-0 end-0 flex items-center justify-center pe-3 text-muted-foreground/80 peer-disabled:opacity-50">
+                        <Mail size={16} strokeWidth={2} aria-hidden="true" />
+                      </div>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="space-y-2">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        id="input-23"
+                        className="pe-9"
+                        placeholder="Password"
+                        type={isVisible ? "text" : "password"}
+                        {...field}
+                      />
+                      <button
+                        className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                        type="button"
+                        onClick={toggleVisibility}
+                        aria-label={
+                          isVisible ? "Hide password" : "Show password"
+                        }
+                        aria-pressed={isVisible}
+                        aria-controls="password"
+                      >
+                        {isVisible ? (
+                          <EyeOff
+                            size={16}
+                            strokeWidth={2}
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          <Eye size={16} strokeWidth={2} aria-hidden="true" />
+                        )}
+                      </button>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              className="absolute inset-y-0 end-7 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                              type="button"
+                              onClick={() => generatePassword()}
+                              aria-label={
+                                isVisible ? "Hide password" : "Show password"
+                              }
+                              aria-pressed={isVisible}
+                              aria-controls="password"
+                            >
+                              {generatingpasswordLoader ? (
+                                <Spinner size="sm"/>
+                              ) : (
+                                <KeyRound
+                                  size={16}
+                                  strokeWidth={2}
+                                  aria-hidden="true"
+                                />
+                              )}
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Generate password</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="space-y-2">
+            <FormField
+              control={form.control}
+              name="note"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Note</FormLabel>
+                  <FormControl>
+                    <Textarea id="textarea-01" placeholder="Note" {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+          <Button variant="secondary" className="absolute right-0 top-0">save</Button>  
+        </form>
+        <div className="w-full h-full">
+          <div className="relative flex w-full items-start gap-2 rounded-lg p-4 has-[[data-state=checked]]:border-ring">
+            <FormField
+              control={form.control}
+              name="security"
+              render={({ field }) => (
+                <FormItem className="order-1 after:absolute">
+                  <FormControl>
+                    <Switch
+                      id="switch-07"
+                      className="order-1 after:absolute after:inset-0 data-[state=unchecked]:border-input data-[state=unchecked]:bg-transparent [&_span]:transition-all [&_span]:data-[state=unchecked]:size-4 [&_span]:data-[state=unchecked]:translate-x-0.5 [&_span]:data-[state=unchecked]:bg-input [&_span]:data-[state=unchecked]:shadow-none rtl:[&_span]:data-[state=unchecked]:-translate-x-0.5"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <div className="grid grow gap-2">
+              <Label htmlFor="checkbox-13">Vault password required</Label>
+              <p
+                id="checkbox-13-description"
+                className="text-xs text-muted-foreground"
+              >
+                Always require your vault password before filling or accessing
+                this login.
+              </p>
             </div>
           </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="input-23">Password</Label>
-          <div className="relative">
-            <Input
-              id="input-23"
-              className="pe-9"
-              placeholder="Password"
-              type={isVisible ? "text" : "password"}
-            />
-            <button
-              className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-              type="button"
-              onClick={toggleVisibility}
-              aria-label={isVisible ? "Hide password" : "Show password"}
-              aria-pressed={isVisible}
-              aria-controls="password"
-            >
-              {isVisible ? (
-                <EyeOff size={16} strokeWidth={2} aria-hidden="true" />
-              ) : (
-                <Eye size={16} strokeWidth={2} aria-hidden="true" />
-              )}
-            </button>
-            <button
-              className="absolute inset-y-0 end-7 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-              type="button"
-              onClick={toggleVisibility}
-              aria-label={isVisible ? "Hide password" : "Show password"}
-              aria-pressed={isVisible}
-              aria-controls="password"
-            >
-              {isVisible ? (
-                <EyeOff size={16} strokeWidth={2} aria-hidden="true" />
-              ) : (
-                <Eye size={16} strokeWidth={2} aria-hidden="true" />
-              )}
-            </button>
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="textarea-01">Note</Label>
-          <Textarea id="textarea-01" placeholder="Leave a comment" />
-        </div>
-      </form>
-      <div className="w-full h-full">
-        <div className="relative flex w-full items-start gap-2 rounded-lg p-4 has-[[data-state=checked]]:border-ring">
-          <Switch
-            id="switch-07"
-            className="order-1 after:absolute after:inset-0 data-[state=unchecked]:border-input data-[state=unchecked]:bg-transparent [&_span]:transition-all [&_span]:data-[state=unchecked]:size-4 [&_span]:data-[state=unchecked]:translate-x-0.5 [&_span]:data-[state=unchecked]:bg-input [&_span]:data-[state=unchecked]:shadow-none rtl:[&_span]:data-[state=unchecked]:-translate-x-0.5"
-          />
-          <div className="grid grow gap-2">
-            <Label htmlFor="checkbox-13">Vault password required</Label>
-            <p
-              id="checkbox-13-description"
-              className="text-xs text-muted-foreground"
-            >
-              Always require your vault password before filling or accessing
-              this login.
-            </p>
-          </div>
-        </div>
-      </div>
+      </Form>
     </div>
   );
 };

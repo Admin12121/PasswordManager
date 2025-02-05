@@ -264,6 +264,7 @@ export default function TaskPage() {
         statusOptions={statusOptions}
         INITIAL_VISIBLE_COLUMNS={INITIAL_VISIBLE_COLUMNS}
         columns={columns}
+        addlink="logins/add-login"
       />
     </div>
   );

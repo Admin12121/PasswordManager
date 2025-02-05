@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Cardwrapper from "./cardwrapper";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,8 +20,12 @@ import { FormSuccess } from "./form-message/form-success";
 import useApi from "@/lib/useApi";
 import { Label } from "../ui/label";
 import { Eye, EyeOff } from "lucide-react";
+import { delay } from "@/lib/utils";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const RegisterForm = () => {
+  const router = useRouter();
   const { data, error, isLoading, fetchData } = useApi<any>();
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
@@ -43,6 +47,15 @@ const RegisterForm = () => {
       data: values,
     });
   };
+
+  useEffect(() => {
+    if (data && data.success) {
+      form.reset();
+      delay(1000);
+      router.push('/auth/login');
+      toast.success('Activation link has been sent to your email');
+    }
+  },[data])
 
   return (
     <Cardwrapper

@@ -48,7 +48,6 @@ export default function InputDemo() {
 
   return (
     <div>
-      {/* Password input field with toggle visibility button */}
       <div className="space-y-2">
         <Label htmlFor="input-51">Input with password strength indicator</Label>
         <div className="relative">

@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "nextjs-toploader/app";
-import { LoaderCircle, Search, ArrowRight, ChevronDown } from "lucide-react";
+import { LoaderCircle, Search, ArrowRight, ChevronDown, Plus } from "lucide-react";
 
 import {
   Table,
@@ -28,7 +28,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-
 interface statusOptionProps {
   name: string;
   uid: string;
@@ -50,8 +49,6 @@ interface columns {
   sortable?: boolean;
 }
 
-
-
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -71,6 +68,7 @@ interface MainTableProps {
   INITIAL_VISIBLE_COLUMNS: string[];
   columns: columns[];
   statusOptions: statusOptionProps[];
+  addlink: string;
 }
 
 export default function MainTable({
@@ -87,7 +85,8 @@ export default function MainTable({
   exclude_by,
   renderCell,
   INITIAL_VISIBLE_COLUMNS,
-  statusOptions
+  statusOptions,
+  addlink,
 }: MainTableProps) {
   const router = useRouter();
   const [filterValue, setFilterValue] = React.useState("");
@@ -260,6 +259,14 @@ export default function MainTable({
                 ))}
               </DropdownMenuContent>
             </DropdownMenuNext>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="flex h-8 gap-2 p-0 data-[state=open]:bg-muted"
+              onClick={() => router.push(addlink)}
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">

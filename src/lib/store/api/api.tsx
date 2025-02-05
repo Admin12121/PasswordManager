@@ -96,6 +96,14 @@ export const userAuthapi = createApi({
         headers: createHeaders(),
       }),
     }),
+    postLogins: builder.mutation({
+      query: ({token, formData}) => ({
+        url: "api/userauth/token/",
+        method: "POST",
+        body: formData,
+        headers: createHeaders(token),
+      }),
+    }),
   }),
 });
 
@@ -107,4 +115,5 @@ export const {
   useUpdateUserProfileMutation,
   useChangeUserPasswordMutation,
   useRefreshTokenMutation,
+  usePostLoginsMutation,
 } = userAuthapi;

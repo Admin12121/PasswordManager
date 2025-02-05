@@ -37,22 +37,34 @@ const CommandDialog = ({ children, ...props }: DialogProps) => {
   );
 };
 
+interface CommandInputProps extends React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> {
+  container?: string;
+  icon?: React.ReactNode;
+}
+
 const CommandInput = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => (
-  <div className="flex items-center border-b border-input px-5" cmdk-input-wrapper="">
-    <Search size={20} strokeWidth={2} className="me-3 text-muted-foreground/80" />
+  React.ComponentRef<typeof CommandPrimitive.Input>,
+  CommandInputProps
+>(({ className, container, icon, ...props }, ref) => (
+  <div
+    className={cn(
+      "flex items-center border-b border-input px-5 rounded-lg transition-shadow focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/20",
+      container
+    )}
+    cmdk-input-wrapper=""
+  >
+    {icon ? icon : <Search size={20} strokeWidth={2} className="me-3 text-muted-foreground/80" />}
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
-        "flex h-10 w-full rounded-lg bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground/70 disabled:cursor-not-allowed disabled:opacity-50",
-        className,
+        "flex h-10 w-full bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground/70 disabled:cursor-not-allowed disabled:opacity-50",
+        className
       )}
       {...props}
     />
   </div>
 ));
+
 
 CommandInput.displayName = CommandPrimitive.Input.displayName;
 
