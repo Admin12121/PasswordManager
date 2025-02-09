@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useAllUsersQuery } from "@/lib/store/api/api";
+import { useGetLoginsQuery } from "@/lib/store/api/api";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import {
   DropdownMenu as DropdownMenuNext,
@@ -54,7 +54,6 @@ interface SiteProps {
 }
 
 interface Users {
-  id: number;
   title: string;
   website: string;
   username: string;
@@ -108,7 +107,6 @@ const INITIAL_VISIBLE_COLUMNS = [
 ];
 
 const columns = [
-  { name: "ID", uid: "id", sortable: true },
   { name: "Website", uid: "website", sortable: true },
   { name: "Username", uid: "username", sortable: true },
   { name: "Password", uid: "password", sortable: true },
@@ -124,7 +122,7 @@ export default function TaskPage() {
   const [page, setPage] = useState<number>(1);
   const [exclude_by, SetExcludeBy] = useState<string>("");
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
-  const { data, isLoading, refetch } = useAllUsersQuery(
+  const { data, isLoading, refetch } = useGetLoginsQuery(
     { search, rowsperpage, page, exclude_by, token: accessToken },
     { skip: !accessToken }
   );
@@ -177,9 +175,7 @@ export default function TaskPage() {
         case "password":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-small capitalize">
-                {users.password || ""}
-              </p>
+              <input type="password" disabled className="bg-transparent border-0 " value={users.password.slice(0,20)}/>
             </div>
           );
         case "last Modified":

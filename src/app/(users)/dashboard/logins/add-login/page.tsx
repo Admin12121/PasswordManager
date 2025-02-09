@@ -1,5 +1,6 @@
 import React from 'react'
-import LoginForm from './_components'
+import dynamic from 'next/dynamic'
+const LoginForm = dynamic(() => import('./_components'))
 
 const Page = () => {
   return (

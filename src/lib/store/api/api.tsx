@@ -16,9 +16,14 @@ const buildQueryParams = (
 ) => {
   const queryParams = Object.entries(params)
     .filter(
-      ([_, value]) => value !== undefined && value !== null && value !== "" && value !== 0 && !(Array.isArray(value) && value.length === 0)
+      ([_, value]) =>
+        value !== undefined &&
+        value !== null &&
+        value !== "" &&
+        value !== 0 &&
+        !(Array.isArray(value) && value.length === 0)
     )
-    .map(([key, value]) => `${key}=${(value)}`)
+    .map(([key, value]) => `${key}=${value}`)
     .join("&");
   return queryParams ? `?${queryParams}` : "";
 };
@@ -28,7 +33,6 @@ export const userAuthapi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}`,
   }),
-  tagTypes: ["LoggedUser"],
   endpoints: (builder) => ({
     userDevice: builder.mutation({
       query: (user) => ({
@@ -60,8 +64,6 @@ export const userAuthapi = createApi({
         method: "GET",
         headers: createHeaders(token),
       }),
-      providesTags: [{ type: "LoggedUser", id: "ME" }],
-      keepUnusedDataFor: Infinity,
     }),
     getUserProfile: builder.query({
       query: ({ username }) => ({
@@ -96,11 +98,10 @@ export const userAuthapi = createApi({
         headers: createHeaders(),
       }),
     }),
-    postLogins: builder.mutation({
-      query: ({token, formData}) => ({
-        url: "api/userauth/token/",
-        method: "POST",
-        body: formData,
+    getLogins: builder.query({
+      query: ({ token, slug }) => ({
+        url: `/api/vault/logins/${buildQueryParams({ slug })}`,
+        method: "GET",
         headers: createHeaders(token),
       }),
     }),
@@ -115,5 +116,5 @@ export const {
   useUpdateUserProfileMutation,
   useChangeUserPasswordMutation,
   useRefreshTokenMutation,
-  usePostLoginsMutation,
+  useGetLoginsQuery,
 } = userAuthapi;

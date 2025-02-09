@@ -384,7 +384,7 @@ export default function MainTable({
         }
       >
         {(item: any) => (
-          <TableRow key={item.id}>
+          <TableRow key={item.slug}>
             {(columnKey: any) => (
               <TableCell>
                 {renderCell(item, columnKey) as React.ReactNode}

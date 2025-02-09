@@ -96,15 +96,6 @@ export function UserNav({ align }: { align?: "center" | "end" | "start" }) {
             Profile
             <DropdownMenuShortcut>⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
-
-          <DropdownMenuItem onClick={() => router.push("/orders")}>
-            My orders
-            <DropdownMenuShortcut>⌘O</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push("/wishlist")}>
-            Wishlist
-            <DropdownMenuShortcut>⌘W</DropdownMenuShortcut>
-          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => router.push("/help&feedback")}>
             Help & Feedback
           </DropdownMenuItem>

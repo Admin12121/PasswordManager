@@ -10,6 +10,7 @@ export interface SpinnerProps {
     | "success"
     | "warning"
     | "danger";
+  className?: string;
 }
 
 const sizeMap = {
@@ -19,7 +20,7 @@ const sizeMap = {
 };
 
 const colorMap = {
-  default: "#27272a ",
+  default: "#27272a",
   primary: "blue",
   secondary: "gray",
   success: "green",
@@ -30,6 +31,7 @@ const colorMap = {
 export const Spinner: React.FC<SpinnerProps> = ({
   size = "md",
   color = "default",
+  className,
 }) => {
   return (
     <svg
@@ -53,6 +55,7 @@ export const Spinner: React.FC<SpinnerProps> = ({
           strokeLinecap: "round",
           animation: "dash4 1.5s ease-in-out infinite",
         }}
+        className={className}
       ></circle>
       <style>
         {`
