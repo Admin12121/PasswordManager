@@ -266,6 +266,7 @@ export default function CardPage() {
         statusOptions={statusOptions}
         INITIAL_VISIBLE_COLUMNS={INITIAL_VISIBLE_COLUMNS}
         columns={columns}
+        addlink="add-card"
       />
     </div>
   );

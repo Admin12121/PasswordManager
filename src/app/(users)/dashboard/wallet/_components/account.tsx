@@ -265,6 +265,7 @@ export default function AccountPage() {
         statusOptions={statusOptions}
         INITIAL_VISIBLE_COLUMNS={INITIAL_VISIBLE_COLUMNS}
         columns={columns}
+        addlink="add-wallet"
       />
     </div>
   );

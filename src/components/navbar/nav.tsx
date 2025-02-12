@@ -26,14 +26,14 @@ const Nav = () => {
     <div className="relative z-50 w-full flex-col items-center mac:container lg:flex mac:mx-auto mac:mt-6">
       <div className="relative z-20 flex w-full items-center justify-center gap-8 lg:bg-transparent mac:justify-stretch">
         <div className="relative hidden h-px flex-1 bg-ln-gray-200 bleed-bg-l bleed-ln-gray-200 mac:flex">
-          <img
+          <Image
             src="https://alignui.com/images/landing/dot.png"
             width="9"
             height="9"
             alt=""
             className="absolute z-30 min-h-[9px] min-w-[9px] -top-1 -left-[37px]"
           />
-          <img
+          <Image
             src="https://alignui.com/images/landing/dot.png"
             width="9"
             height="9"
@@ -150,14 +150,14 @@ const Nav = () => {
           </a>
         </header>
         <div className="relative hidden h-px flex-1 bg-ln-gray-200 bleed-bg-r bleed-ln-gray-200 mac:block">
-          <img
+          <Image
             src="https://alignui.com/images/landing/dot.png"
             width="9"
             height="9"
             alt=""
             className="absolute z-30 min-h-[9px] min-w-[9px] -top-1 -right-[37px] left-auto"
           />
-          <img
+          <Image
             src="https://alignui.com/images/landing/dot.png"
             width="9"
             height="9"

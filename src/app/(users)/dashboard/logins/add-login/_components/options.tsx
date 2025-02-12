@@ -267,7 +267,9 @@ const Options = ({ value, setValue, setTitle }: OptionProps) => {
                 onSelect={(currentValue) => {
                   setValue(currentValue);
                   setSelectedItem(item);
-                  setTitle ? setTitle(item.label) : null;
+                  if (setTitle) {
+                    setTitle(item.label);
+                  }
                   setOpen(false);
                 }}
                 className="flex items-center justify-between"
