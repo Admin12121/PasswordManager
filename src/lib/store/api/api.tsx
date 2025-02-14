@@ -100,7 +100,7 @@ export const userAuthapi = createApi({
     }),
     getLogins: builder.query({
       query: ({ token, slug }) => ({
-        url: `/api/vault/logins/${buildQueryParams({ slug })}`,
+        url: `/api/vault/logins/${buildQueryParams({ slug })}/`,
         method: "GET",
         headers: createHeaders(token),
       }),

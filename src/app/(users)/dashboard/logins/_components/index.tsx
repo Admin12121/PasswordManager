@@ -24,6 +24,20 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
+import { Pointer } from "@/components/global/floating-mouse";
+import { Files, Lock, LogIn } from "lucide-react";
+import { format } from "date-fns";
+import { toast } from "sonner";
+import { items } from "@/components/global/sites";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import VaultModal from "./vault_dialog";
+import Link from "next/link";
+import { useDecryptedData } from "@/hooks/dec-data";
 
 const MainTable = dynamic(() => import("@/components/global/table"), {
   ssr: false,
@@ -51,9 +65,11 @@ interface SiteProps {
   };
   description?: string;
   name: string;
+  href: string;
 }
 
 interface Users {
+  slug: string;
   title: string;
   website: string;
   username: string;
@@ -81,20 +97,52 @@ export const labels = [
   },
 ];
 
-const Website = ({ avatarProps, classNames, description, name }: SiteProps) => {
+const Website = ({
+  avatarProps,
+  classNames,
+  description,
+  name,
+  href,
+}: SiteProps) => {
+  const matchedItem = items.find(
+    (item) => item.label.toLowerCase() === name.toLowerCase()
+  );
+  const Icon: any = matchedItem?.icon;
   return (
-    <div className={cn("flex gap-2", classNames?.base)}>
-      <Avatar>
-        <AvatarImage src={avatarProps.src || ""} alt={avatarProps.name} />
-        <AvatarFallback>
-          {avatarProps?.icon || avatarProps.name.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
-      <span className={cn("", classNames?.name)}>
-        <h1>{name}</h1>
-        <p className={cn("", classNames?.description)}>{description}</p>
-      </span>
-    </div>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <a
+            href={href}
+            target="_blank"
+            className="group flex justify-between items-center"
+          >
+            <div className={cn("flex gap-2", classNames?.base)}>
+              <Avatar>
+                <AvatarImage
+                  src={avatarProps.src || ""}
+                  alt={avatarProps.name}
+                />
+                <AvatarFallback className="bg-transparent">
+                  {Icon ? (
+                    <Icon className="w-5 h-5" />
+                  ) : (
+                    avatarProps.name.slice(0, 2).toUpperCase()
+                  )}
+                </AvatarFallback>
+              </Avatar>
+              <span className={cn("flex items-center", classNames?.name)}>
+                <h1>{name}</h1>
+              </span>
+            </div>
+            <LogIn className="group-hover:opacity-100 opacity-0 transition-all duration-500 w-4 h-4" />
+          </a>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{description}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 
@@ -122,10 +170,11 @@ export default function TaskPage() {
   const [page, setPage] = useState<number>(1);
   const [exclude_by, SetExcludeBy] = useState<string>("");
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
-  const { data, isLoading, refetch } = useGetLoginsQuery(
+  const { data: encryptedData, isLoading, refetch } = useGetLoginsQuery(
     { search, rowsperpage, page, exclude_by, token: accessToken },
     { skip: !accessToken }
   );
+  const {data, loading} = useDecryptedData(encryptedData, isLoading);
 
   useEffect(() => {
     if (search) {
@@ -142,7 +191,6 @@ export default function TaskPage() {
   const renderCell = useCallback(
     (users: Users, columnKey: React.Key) => {
       const cellValue = users[columnKey as keyof Users];
-
       switch (columnKey) {
         case "website":
           return (
@@ -150,7 +198,6 @@ export default function TaskPage() {
               avatarProps={{
                 src: users?.website as string,
                 name: `${users.username.slice(0, 1)}`,
-                // icon: `${(<AvatarIcon />)}`,
                 classNames: {
                   base: "bg-gradient-to-br from-[#FFB457] to-[#FF705B] cursor-pointer",
                   icon: "text-black/80",
@@ -162,29 +209,71 @@ export default function TaskPage() {
               }}
               description={users.username}
               name={`${users.title}`}
+              href={users.website}
             />
           );
         case "username":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-small capitalize">
-                {users.username}
-              </p>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    {users.security ? (
+                      <VaultModal security={users.security}>
+                        <p className="text-bold text-small flex gap-2">
+                          Vault Password Required <Lock className="w-4 h-4" />
+                        </p>
+                      </VaultModal>
+                    ) : (
+                      <Link href={`logins/${users.slug}`} className="text-bold text-small">{users.username}</Link>
+                    )}
+                  </TooltipTrigger>
+                  {!users.security && (
+                    <TooltipContent>
+                      <p>{users.username}</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
             </div>
           );
         case "password":
+          const copyToClipboard = () => {
+            if (users.password && !users.security) {
+              navigator.clipboard.writeText(users.password);
+              toast.success("Password copied to clipboard");
+            }
+          };
           return (
             <div className="flex flex-col">
-              <input type="password" disabled className="bg-transparent border-0 " value={users.password.slice(0,20)}/>
+              <Pointer
+                onClick={copyToClipboard}
+                name={
+                  users.security ? (
+                    <Lock className="w-4 h-4" />
+                  ) : (
+                    <span className="w-7 h-7 rounded-full bg-white flex items-center justify-center">
+                      <Files className="w-4 h-4 stroke-black" />
+                    </span>
+                  )
+                }
+                className="h-10 flex items-center"
+              >
+                <VaultModal security={users.security}>
+                  <p className="text-foreground">
+                    {!users.security && "*******************"}
+                  </p>
+                </VaultModal>
+              </Pointer>
             </div>
           );
-        case "last Modified":
+        case "updated_at":
           return (
             <Chip
               className={`capitalize border-none gap-1 text-default-600`}
               variant={users.state ? "secondary" : "outline"}
             >
-              {users.state}
+              {format(users.updated_at, "dd MMM yyyy")}
             </Chip>
           );
         case "actions":
