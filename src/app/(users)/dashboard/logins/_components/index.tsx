@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useGetLoginsQuery } from "@/lib/store/api/api";
+import {
+  useGetLoginsQuery,
+} from "@/lib/store/api/api";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import {
   DropdownMenu as DropdownMenuNext,
@@ -35,7 +37,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import VaultModal from "./vault_dialog";
+import VaultModal, { DeleteModal } from "./vault_dialog";
 import Link from "next/link";
 import { useDecryptedData } from "@/hooks/dec-data";
 
@@ -163,18 +165,23 @@ const columns = [
 ];
 
 export default function TaskPage() {
-  const { accessToken } = useAuthUser();
   const router = useRouter();
+  const [open, setOpen] = useState<string | null>(null);
+  const { accessToken } = useAuthUser();
   const [search, setSearch] = useState<string>("");
   const [rowsperpage, setRowsPerPage] = useState<number | null>(null);
   const [page, setPage] = useState<number>(1);
   const [exclude_by, SetExcludeBy] = useState<string>("");
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
-  const { data: encryptedData, isLoading, refetch } = useGetLoginsQuery(
+  const {
+    data: encryptedData,
+    isLoading,
+    refetch,
+  } = useGetLoginsQuery(
     { search, rowsperpage, page, exclude_by, token: accessToken },
     { skip: !accessToken }
   );
-  const {data, loading} = useDecryptedData(encryptedData, isLoading);
+  const { data, loading } = useDecryptedData(encryptedData, isLoading);
 
   useEffect(() => {
     if (search) {
@@ -225,7 +232,12 @@ export default function TaskPage() {
                         </p>
                       </VaultModal>
                     ) : (
-                      <Link href={`logins/${users.slug}`} className="text-bold text-small">{users.username}</Link>
+                      <Link
+                        href={`logins/${users.slug}`}
+                        className="text-bold text-small"
+                      >
+                        {users.username}
+                      </Link>
                     )}
                   </TooltipTrigger>
                   {!users.security && (
@@ -312,10 +324,12 @@ export default function TaskPage() {
                     </DropdownMenuSubContent>
                   </DropdownMenuSub>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    Delete
-                    <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-                  </DropdownMenuItem>
+                  <DeleteModal refetch={refetch} slug={users.slug} token={accessToken}>
+                    <Button variant="ghost" className="w-full rounded-md hover:bg-orange-600" size="sm">
+                      Delete
+                      <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+                    </Button>
+                  </DeleteModal>
                 </DropdownMenuContent>
               </DropdownMenuNext>
             </div>

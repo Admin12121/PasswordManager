@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useDeleteLoginsMutation } from "@/lib/store/api/api";
 import {
   Dialog,
   DialogClose,
@@ -15,17 +16,32 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CircleAlert } from "lucide-react";
 import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
-
-export default function VaultModal({security, children}:{security:boolean, children:React.ReactNode}) {
+export default function VaultModal({
+  security,
+  children,
+}: {
+  security: boolean;
+  children: React.ReactNode;
+}) {
   const [inputValue, setInputValue] = useState("");
   const passwordValidation = () => {};
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <span className="w-full h-full flex items-center">
-          {children}
-        </span>
+        <span className="w-full h-full flex items-center">{children}</span>
       </DialogTrigger>
       {security && (
         <DialogContent>
@@ -65,5 +81,48 @@ export default function VaultModal({security, children}:{security:boolean, child
         </DialogContent>
       )}
     </Dialog>
+  );
+}
+
+export function DeleteModal({
+  children,
+  slug,
+  token,
+  refetch
+}: {
+  children: React.ReactNode;
+  slug: string | null;
+  token: string | undefined;
+  refetch: () => void;
+}) {
+  const [deleteLogins] = useDeleteLoginsMutation();
+  const handleDelete = async (slug: string | null) => {
+    const res = await deleteLogins({ slug, token });
+    if (res.data) {
+      refetch();
+      toast.success("Login deleted successfully");
+    } else {
+      toast.error("Failed to delete login");
+    }
+    refetch();
+  };
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently delete your
+            account and remove your data from our servers.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={()=>handleDelete(slug)}>Continue</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

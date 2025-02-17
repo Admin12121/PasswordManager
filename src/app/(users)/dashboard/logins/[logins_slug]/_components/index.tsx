@@ -1,5 +1,7 @@
-import React, { useState, useCallback } from "react";
-import { useGetLoginsQuery } from "@/lib/store/api/api";
+"use client";
+
+import React, { useState, useCallback, useEffect } from "react";
+import { useGetLoginsQuery, useDeleteLoginsMutation } from "@/lib/store/api/api";
 import { useDecryptedData } from "@/hooks/dec-data";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -66,7 +68,6 @@ const defaultFormValues: FormValues = {
   security: false,
 };
 
-
 interface ViewLoginProps {
   slug: string;
 }
@@ -78,7 +79,9 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
     error,
     isLoading,
   } = useGetLoginsQuery({ slug, token: accessToken }, { skip: !slug });
+  const [ deleteLogins ] = useDeleteLoginsMutation();
   const { data, loading } = useDecryptedData(encryptedData, isLoading);
+  const [update, setUpdate] = useState<boolean>(false);
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [generatingpasswordLoader, setGeneratePassword] =
@@ -91,6 +94,19 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
     mode: "onChange",
     defaultValues: defaultFormValues,
   });
+
+  useEffect(() => {
+    if (data) {
+      form.reset({
+        username: data.username,
+        title: data.title,
+        website: data.website,
+        password: data.password,
+        note: data.note,
+        security: data.security,
+      });
+    }
+  }, [data, form]);
 
   const { reset, setValue } = form;
 
@@ -283,9 +299,15 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
               )}
             />
           </div>
-          <Button variant="secondary" className="absolute right-0 top-0">
-            save
-          </Button>
+          {update && (
+            <Button
+              type="submit"
+              variant="secondary"
+              className="absolute right-0 top-0"
+            >
+              Update
+            </Button>
+          )}
         </div>
         <div className="w-full h-full">
           <div className="relative flex w-full items-start gap-2 rounded-lg p-4 has-[[data-state=checked]]:border-ring">
@@ -314,6 +336,14 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
           </div>
         </div>
       </form>
+      {!update && <Button
+        type="button"
+        variant="secondary"
+        className="absolute right-0 top-2"
+        onClick={() => setUpdate(true)}
+      >
+        Edit
+      </Button>}
     </Form>
   );
 };

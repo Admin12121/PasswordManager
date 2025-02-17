@@ -46,8 +46,9 @@ export async function POST(request: NextRequest) {
       }
     );
     if (response.ok) {
+      const responseData = await response.json();
       return NextResponse.json(
-        { data: { mesage: "Login Data Saved" } },
+        { data: { mesage: "Login Data Saved",  slug: responseData.slug } },
         { status: 200 }
       );
     } else {

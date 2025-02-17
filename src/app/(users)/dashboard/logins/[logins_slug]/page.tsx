@@ -1,5 +1,6 @@
 import React from "react";
-import ViewLogin from "./_components";
+import dynamic from "next/dynamic";
+const LoginView = dynamic(() => import("./_components"));
 
 const Page = async ({
   params,
@@ -7,7 +8,7 @@ const Page = async ({
   params: Promise<{ logins_slug: string }>;
 }) => {
   const slug = (await params).logins_slug;
-  return <ViewLogin slug={slug}/>;
+  return <LoginView slug={slug}/>;
 };
 
 export default Page;

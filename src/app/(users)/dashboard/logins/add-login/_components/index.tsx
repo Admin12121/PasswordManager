@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -26,10 +26,13 @@ import {
 import { toast } from "sonner";
 import { delay } from "@/lib/utils";
 import { useAuthUser } from "@/hooks/use-auth-user";
+import { useGetLoggedUserQuery, useSetvaultpasswordMutation } from "@/lib/store/api/api";
 import Options from "./options";
 import Spinner from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { encryptData } from "@/hooks/dec-data";
+import { useRouter } from "next/navigation";
+import { useDecryptedData } from "@/hooks/dec-data";
 
 const formSchema = z.object({
   title: z
@@ -55,7 +58,19 @@ const formSchema = z.object({
   security: z.boolean().optional(),
 });
 
+const vaultPasswordSchema = z.object({
+  vaultpassword: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters long" })
+    .max(128, { message: "Password must be less than 128 characters" }),
+});
+
+type VaultPassword = z.infer<typeof vaultPasswordSchema>;
 type FormValues = z.infer<typeof formSchema>;
+
+const defaultVaultPasswordValues: VaultPassword = {
+  vaultpassword: "",
+};
 
 const defaultFormValues: FormValues = {
   title: "",
@@ -66,8 +81,24 @@ const defaultFormValues: FormValues = {
   security: false,
 };
 
+interface UserData {
+  email: string;
+  profile: string | null;
+  phone: string | null;
+  username: string;
+  last_name: string;
+  first_name: string;
+  role: string;
+  gender: string | null;
+  dob: string | null;
+  vautpassword: string;
+}
+
 const LoginForm = () => {
+  const router = useRouter();
   const { accessToken } = useAuthUser();
+  const [user, setUser] = useState<UserData>();
+  const [setvault] = useSetvaultpasswordMutation();
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [generatingpasswordLoader, setGeneratePassword] =
     useState<boolean>(false);
@@ -80,7 +111,14 @@ const LoginForm = () => {
     defaultValues: defaultFormValues,
   });
 
-  const { reset, setValue } = form;
+
+  const vaultPasswordForm = useForm<VaultPassword>({
+    resolver: zodResolver(vaultPasswordSchema),
+    mode: "onChange",
+    defaultValues: defaultVaultPasswordValues,
+  });
+
+  const { reset, setValue, getValues } = form;
 
   const onSubmit = useCallback(async (data: FormValues) => {
     if (!accessToken) return;
@@ -92,6 +130,13 @@ const LoginForm = () => {
     });
     const newData = encryptData(data, accessToken);
     await delay(500);
+    if(getValues("security") && !user?.vautpassword){
+      toast.error("Please set vault password", {
+        id: toastId,
+        position: "top-center",
+      });
+      return;
+    }
     try {
       const response = await fetch("/api/vault/logins/", {
         method: "POST",
@@ -102,7 +147,9 @@ const LoginForm = () => {
         body: JSON.stringify({ data: newData }),
       });
       if (response.ok) {
+        const res = await response.json();
         reset();
+        router.push(res.data.slug);
         toast.success("Added SuccessFull", {
           id: toastId,
           position: "top-center",
@@ -146,6 +193,42 @@ const LoginForm = () => {
       setGeneratePassword(false);
     }, 1000);
   };
+
+  const { data: encryptedData, isLoading, refetch: profilerefetch } = useGetLoggedUserQuery(
+    { token: accessToken },
+    { skip: !accessToken || !getValues("security") }
+  );
+  const { data, loading } = useDecryptedData(encryptedData, isLoading);
+  useEffect(() => {
+    if (data) {
+      setUser(data);
+    }
+  }, [data]);
+
+  const onSubmitVaultPassword = useCallback(async () => {
+    if (!accessToken) return;
+    const toastId = toast.loading("Adding...", { position: "top-center" });
+    await delay(500);
+    try {
+      const data = vaultPasswordForm.getValues();
+      const res = await setvault({ data, token: accessToken });
+      if (res.data) {
+        toast.success("Added SuccessFull", {
+          id: toastId,
+          position: "top-center",
+        });
+        profilerefetch();
+      } else {
+        toast.error("Something went wrong", {
+          id: toastId,
+          position: "top-center",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }, []);
+
 
   return (
     <Form {...form}>
@@ -329,6 +412,26 @@ const LoginForm = () => {
               </p>
             </div>
           </div>
+          {user && !user?.vautpassword && getValues("security") && <Form {...vaultPasswordForm}>
+            <div className="flex gap-3 w-full items-center flex-col lg:flex-row p-4">
+              <div className="space-y-2 relative w-full">
+                <FormField
+                  control={vaultPasswordForm.control}
+                  name="vaultpassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Vault Password</FormLabel>
+                      <FormControl>
+                        <Input placeholder="vault Password" type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="button" onClick={()=>onSubmitVaultPassword()} className="absolute right-0">Set vault Password</Button>
+              </div>
+            </div>
+          </Form>}
         </div>
       </form>
     </Form>
