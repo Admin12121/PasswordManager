@@ -43,8 +43,16 @@ export const userAuthapi = createApi({
       }),
     }),
     setvaultpassword: builder.mutation({
-      query: ({data, token}) => ({
+      query: ({ data, token }) => ({
         url: "api/userauth/users/setvaultpassword/",
+        method: "POST",
+        body: data,
+        headers: createHeaders(token),
+      }),
+    }),
+    verifyvaultpassword: builder.mutation({
+      query: ({ data, token }) => ({
+        url: "api/userauth/users/verifyvaultpassword/",
         method: "POST",
         body: data,
         headers: createHeaders(token),
@@ -107,8 +115,9 @@ export const userAuthapi = createApi({
       }),
     }),
     getLogins: builder.query({
-      query: ({ token, slug }) => ({
-        url: `/api/vault/logins/${slug ? `${slug}/` : ""}`,
+      query: ({ slug, search, page_size, page, exclude_by, token }) => (
+        {
+        url: `/api/vault/logins/${slug ? `${slug}/` : ""}${buildQueryParams({ search, page_size, page, exclude_by })}`,
         method: "GET",
         headers: createHeaders(token),
       }),
@@ -121,7 +130,7 @@ export const userAuthapi = createApi({
       }),
     }),
     deleteLogins: builder.mutation({
-      query: ({ slug , token}) => ({
+      query: ({ slug, token }) => ({
         url: `/api/vault/logins/${slug ? `${slug}/` : ""}`,
         method: "DELETE",
         headers: createHeaders(token),
@@ -133,6 +142,7 @@ export const userAuthapi = createApi({
 export const {
   useUserDeviceMutation,
   useSetvaultpasswordMutation,
+  useVerifyvaultpasswordMutation,
   useAllUsersQuery,
   useGetLoggedUserQuery,
   useGetUserProfileQuery,

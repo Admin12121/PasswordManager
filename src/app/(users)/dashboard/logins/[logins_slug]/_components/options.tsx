@@ -15,9 +15,10 @@ interface OptionProps {
   value: string;
   setValue: (value: string) => void;
   setTitle?: (title: string) => void;
+  disabled?: boolean;
 }
 
-const Options = ({ value, setValue, setTitle }: OptionProps) => {
+const Options = ({ value, setValue, setTitle, disabled }: OptionProps) => {
   const [open, setOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<(typeof items)[0] | null>(
     null
@@ -47,6 +48,7 @@ const Options = ({ value, setValue, setTitle }: OptionProps) => {
   return (
     <Command className="relative w-full overflow-visible">
       <CommandInput
+        disabled={disabled}
         placeholder="https://example.com"
         container={cn(
           "flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm shadow-black/5 transition-shadow placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50"

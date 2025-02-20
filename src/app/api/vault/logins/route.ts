@@ -80,9 +80,9 @@ export async function PATCH(request: NextRequest) {
     const key = token.slice(0, 32);
     const decryptedData = decryptData(encryptedData, key);
     const response = await fetch(
-      `${process.env.BACKEND_URL}/api/vault/logins/${decryptedData.id}`,
+      `${process.env.BACKEND_URL}/api/vault/logins/${decryptedData.slug}/`,
       {
-        method: "POST",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           authorization: authorizationHeader,

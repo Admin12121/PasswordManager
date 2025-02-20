@@ -1,13 +1,16 @@
 "use client";
 
 import React, { useState, useCallback, useEffect } from "react";
-import { useGetLoginsQuery, useDeleteLoginsMutation } from "@/lib/store/api/api";
+import {
+  useGetLoginsQuery,
+  useDeleteLoginsMutation,
+} from "@/lib/store/api/api";
 import { useDecryptedData } from "@/hooks/dec-data";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { z } from "zod";
-import { Mail, Eye, EyeOff, KeyRound } from "lucide-react";
+import { Mail, Eye, EyeOff, KeyRound, Files } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -34,6 +37,7 @@ import { encryptData } from "@/hooks/dec-data";
 import { useAuthUser } from "@/hooks/use-auth-user";
 
 const formSchema = z.object({
+  slug: z.string(),
   title: z
     .string()
     .min(1, { message: "Title is required" })
@@ -60,6 +64,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const defaultFormValues: FormValues = {
+  slug: "",
   title: "",
   website: "",
   username: "",
@@ -78,8 +83,9 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
     data: encryptedData,
     error,
     isLoading,
+    refetch
   } = useGetLoginsQuery({ slug, token: accessToken }, { skip: !slug });
-  const [ deleteLogins ] = useDeleteLoginsMutation();
+  const [deleteLogins] = useDeleteLoginsMutation();
   const { data, loading } = useDecryptedData(encryptedData, isLoading);
   const [update, setUpdate] = useState<boolean>(false);
 
@@ -98,6 +104,7 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
   useEffect(() => {
     if (data) {
       form.reset({
+        slug: data.slug,
         username: data.username,
         title: data.title,
         website: data.website,
@@ -112,7 +119,7 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
 
   const onSubmit = useCallback(async (data: FormValues) => {
     if (!accessToken) return;
-    const toastId = toast.loading("Adding...", { position: "top-center" });
+    const toastId = toast.loading("Updating...", { position: "top-center" });
     await delay(500);
     toast.success("Encrypting Data...", {
       id: toastId,
@@ -122,7 +129,7 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
     await delay(500);
     try {
       const response = await fetch("/api/vault/logins/", {
-        method: "POST",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
@@ -131,10 +138,11 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
       });
       if (response.ok) {
         reset();
-        toast.success("Added SuccessFull", {
+        toast.success("Updated SuccessFull", {
           id: toastId,
           position: "top-center",
         });
+        refetch();
       } else {
         toast.error("Something went wrong", {
           id: toastId,
@@ -145,6 +153,16 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
       console.error("Error:", error);
     }
   }, []);
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied to clipboard");
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Failed to copy to clipboard");
+    }
+  };
 
   return (
     <Form {...form}>
@@ -161,7 +179,7 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Title" {...field} />
+                    <Input disabled={!update} placeholder="Title" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -180,6 +198,7 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
                       value={field.value}
                       setValue={(value) => setValue("website", value)}
                       setTitle={(title) => setValue("title", title)}
+                      disabled={!update}
                     />
                   </FormControl>
                 </FormItem>
@@ -196,6 +215,7 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
                   <FormControl>
                     <div className="relative">
                       <Input
+                        disabled={!update}
                         className="peer pe-9"
                         placeholder="vickytajpuriya@gmail.com"
                         {...field}
@@ -220,6 +240,7 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
                   <FormControl>
                     <div className="relative">
                       <Input
+                        disabled={!update}
                         className="pe-9"
                         placeholder="Password"
                         type={isVisible ? "text" : "password"}
@@ -246,38 +267,67 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
                           <Eye size={16} strokeWidth={2} aria-hidden="true" />
                         )}
                       </button>
-                      <TooltipProvider>
+
+                      {!update && <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button
                               className="absolute inset-y-0 end-7 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
                               type="button"
-                              // onClick={() => generatePassword()}
+                              onClick={() => copyToClipboard(field.value)}
                               aria-label={
                                 isVisible ? "Hide password" : "Show password"
                               }
                               aria-pressed={isVisible}
                               aria-controls="password"
                             >
-                              {generatingpasswordLoader ? (
-                                <Spinner
-                                  size="sm"
-                                  className="dark:!stroke-white"
-                                />
-                              ) : (
-                                <KeyRound
-                                  size={16}
-                                  strokeWidth={2}
-                                  aria-hidden="true"
-                                />
-                              )}
+                              <Files
+                                size={16}
+                                strokeWidth={2}
+                                aria-hidden="true"
+                              />
                             </button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Generate password</p>
+                            <p>Copy</p>
                           </TooltipContent>
                         </Tooltip>
-                      </TooltipProvider>
+                      </TooltipProvider>}
+
+                      {update && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                className="absolute inset-y-0 end-7 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                                type="button"
+                                // onClick={() => generatePassword()}
+                                aria-label={
+                                  isVisible ? "Hide password" : "Show password"
+                                }
+                                aria-pressed={isVisible}
+                                aria-controls="password"
+                              >
+                                {generatingpasswordLoader ? (
+                                  <Spinner
+                                    size="sm"
+                                    className="dark:!stroke-white"
+                                  />
+                                ) : (
+                                  <KeyRound
+                                    size={16}
+                                    strokeWidth={2}
+                                    aria-hidden="true"
+                                  />
+                                )}
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Generate password</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -293,20 +343,34 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
                 <FormItem>
                   <FormLabel>Note</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Note" {...field} />
+                    <Textarea
+                      disabled={!update}
+                      placeholder="Note"
+                      {...field}
+                    />
                   </FormControl>
                 </FormItem>
               )}
             />
           </div>
           {update && (
-            <Button
-              type="submit"
-              variant="secondary"
-              className="absolute right-0 top-0"
-            >
-              Update
-            </Button>
+            <>
+              <Button
+                type="button"
+                variant="secondary"
+                className="absolute right-24 top-0"
+                onClick={() => setUpdate(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="secondary"
+                className="absolute right-0 top-0"
+              >
+                Update
+              </Button>
+            </>
           )}
         </div>
         <div className="w-full h-full">
@@ -318,6 +382,7 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
                 <FormItem className="order-1 after:absolute">
                   <FormControl>
                     <Switch
+                      disabled={!update}
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       className="order-1 after:absolute after:inset-0 data-[state=unchecked]:border-input data-[state=unchecked]:bg-transparent [&_span]:transition-all [&_span]:data-[state=unchecked]:size-4 [&_span]:data-[state=unchecked]:translate-x-0.5 [&_span]:data-[state=unchecked]:bg-input [&_span]:data-[state=unchecked]:shadow-none rtl:[&_span]:data-[state=unchecked]:-translate-x-0.5"
@@ -336,14 +401,16 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
           </div>
         </div>
       </form>
-      {!update && <Button
-        type="button"
-        variant="secondary"
-        className="absolute right-0 top-2"
-        onClick={() => setUpdate(true)}
-      >
-        Edit
-      </Button>}
+      {!update && (
+        <Button
+          type="button"
+          variant="secondary"
+          className="absolute right-0 top-2"
+          onClick={() => setUpdate(true)}
+        >
+          Edit
+        </Button>
+      )}
     </Form>
   );
 };

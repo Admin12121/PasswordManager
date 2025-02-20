@@ -9,14 +9,8 @@ import {
   DropdownMenu as DropdownMenuNext,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuCheckboxItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -166,10 +160,9 @@ const columns = [
 
 export default function TaskPage() {
   const router = useRouter();
-  const [open, setOpen] = useState<string | null>(null);
   const { accessToken } = useAuthUser();
   const [search, setSearch] = useState<string>("");
-  const [rowsperpage, setRowsPerPage] = useState<number | null>(null);
+  const [rowsperpage, setRowsPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
   const [exclude_by, SetExcludeBy] = useState<string>("");
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
@@ -178,10 +171,17 @@ export default function TaskPage() {
     isLoading,
     refetch,
   } = useGetLoginsQuery(
-    { search, rowsperpage, page, exclude_by, token: accessToken },
+    { search, page_size: rowsperpage, page, exclude_by, token: accessToken },
     { skip: !accessToken }
   );
+
   const { data, loading } = useDecryptedData(encryptedData, isLoading);
+
+  useEffect(() => {
+    if(encryptedData){
+      refetch();
+    }
+  },[])
 
   useEffect(() => {
     if (search) {
@@ -226,7 +226,7 @@ export default function TaskPage() {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     {users.security ? (
-                      <VaultModal security={users.security}>
+                      <VaultModal slug={users.slug} security={users.security} accessToken={accessToken}>
                         <p className="text-bold text-small flex gap-2">
                           Vault Password Required <Lock className="w-4 h-4" />
                         </p>
@@ -271,7 +271,7 @@ export default function TaskPage() {
                 }
                 className="h-10 flex items-center"
               >
-                <VaultModal security={users.security}>
+                <VaultModal slug={users.slug} security={users.security} accessToken={accessToken}>
                   <p className="text-foreground">
                     {!users.security && "*******************"}
                   </p>
@@ -301,28 +301,7 @@ export default function TaskPage() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-[160px]">
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => router.push(`/users/${users.username}`)}
-                  >
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>View</DropdownMenuItem>
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>State</DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
-                      <DropdownMenuRadioGroup value={users.state}>
-                        {labels.map((label) => (
-                          <DropdownMenuRadioItem
-                            key={label.value}
-                            value={label.value}
-                          >
-                            {label.label}
-                          </DropdownMenuRadioItem>
-                        ))}
-                      </DropdownMenuRadioGroup>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
+                  <DropdownMenuItem  onClick={() => router.push(`logins/${users.slug}`)}>View</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DeleteModal refetch={refetch} slug={users.slug} token={accessToken}>
                     <Button variant="ghost" className="w-full rounded-md hover:bg-orange-600" size="sm">

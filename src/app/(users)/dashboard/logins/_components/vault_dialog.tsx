@@ -1,21 +1,22 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useDeleteLoginsMutation } from "@/lib/store/api/api";
+import {
+  useDeleteLoginsMutation,
+  useVerifyvaultpasswordMutation,
+} from "@/lib/store/api/api";
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { CircleAlert } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,16 +29,68 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useRouter } from "nextjs-toploader/app";
+
+const vaultPasswordSchema = z.object({
+  vaultpassword: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters long" })
+    .max(128, { message: "Password must be less than 128 characters" }),
+  slug: z.string(),
+});
+
+type VaultPassword = z.infer<typeof vaultPasswordSchema>;
+
+const defaultVaultPasswordValues: VaultPassword = {
+  vaultpassword: "",
+  slug: "",
+};
 
 export default function VaultModal({
   security,
   children,
+  accessToken,
+  slug,
 }: {
   security: boolean;
   children: React.ReactNode;
+  accessToken: string | undefined;
+  slug: string;
 }) {
-  const [inputValue, setInputValue] = useState("");
-  const passwordValidation = () => {};
+  const router = useRouter();
+  const [verify] = useVerifyvaultpasswordMutation();
+
+  
+  const handleVerify = async (data: VaultPassword) => {
+    const res = await verify({ data, token: accessToken });
+    if (res.data) {
+      toast.success("Vault unlocked successfully");
+      router.push(`logins/${res.data.slug}`);
+    } else {
+      toast.error("Failed to unlock vault");
+    }
+  };
+  const vaultPasswordForm = useForm<VaultPassword>({
+    resolver: zodResolver(vaultPasswordSchema),
+    mode: "onChange",
+    defaultValues: defaultVaultPasswordValues,
+  });
+  
+  useEffect(() => {
+    vaultPasswordForm.setValue("slug", slug);
+  }, [slug]);
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -58,26 +111,41 @@ export default function VaultModal({
               </DialogTitle>
             </DialogHeader>
           </div>
-          <form className="space-y-5">
-            <div className="space-y-2">
-              <Label>Vault Password</Label>
-              <Input type="password" placeholder="Enter Vault Password" />
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button type="button" variant="outline" className="flex-1">
-                  Cancel
+          <Form {...vaultPasswordForm}>
+            <form
+              className="space-y-5"
+              onSubmit={vaultPasswordForm.handleSubmit(handleVerify)}
+            >
+              <div className="space-y-2">
+                <FormField
+                  control={vaultPasswordForm.control}
+                  name="vaultpassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Vault Password</FormLabel>
+                      <FormControl>
+                        <Input placeholder="vault Password" type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline" className="flex-1">
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <Button
+                  className="flex-1"
+                  disabled={vaultPasswordForm.getValues("vaultpassword") == ""}
+                >
+                  Unlock
                 </Button>
-              </DialogClose>
-              <Button
-                type="button"
-                className="flex-1"
-                disabled={inputValue == ""}
-              >
-                Unlock
-              </Button>
-            </DialogFooter>
-          </form>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       )}
     </Dialog>
@@ -88,7 +156,7 @@ export function DeleteModal({
   children,
   slug,
   token,
-  refetch
+  refetch,
 }: {
   children: React.ReactNode;
   slug: string | null;
@@ -120,7 +188,9 @@ export function DeleteModal({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={()=>handleDelete(slug)}>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={() => handleDelete(slug)}>
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

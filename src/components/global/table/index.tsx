@@ -2,7 +2,13 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "nextjs-toploader/app";
-import { LoaderCircle, Search, ArrowRight, ChevronDown, Plus } from "lucide-react";
+import {
+  LoaderCircle,
+  Search,
+  ArrowRight,
+  ChevronDown,
+  Plus,
+} from "lucide-react";
 
 import {
   Table,
@@ -59,7 +65,7 @@ interface MainTableProps {
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   isLoading: boolean;
   searchLoading: boolean;
-  dataperpage: React.Dispatch<React.SetStateAction<number | null>>;
+  dataperpage: React.Dispatch<React.SetStateAction<number>>;
   refetch: () => void;
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
@@ -91,9 +97,6 @@ export default function MainTable({
   const router = useRouter();
   const [filterValue, setFilterValue] = React.useState("");
   const [searchValue, setsearchValue] = React.useState("");
-  const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
-    new Set([])
-  );
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
@@ -170,10 +173,22 @@ export default function MainTable({
     setPage(1);
   };
 
-  const onSearchChange = (value?: string) => {
+  function debounce(func: (...args: any[]) => void, wait: number) {
+    let timeout: NodeJS.Timeout;
+    return function executedFunction(...args: any[]) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  const onSearchChange = (value: string) => {
     if (value) {
       setsearchValue(value);
-      setSearch(value);
+      debouncedSetSearch(value);
       setPage(1);
     } else {
       setFilterValue("");
@@ -181,6 +196,13 @@ export default function MainTable({
       setSearch("");
     }
   };
+
+  const debouncedSetSearch = React.useCallback(
+    debounce((value: string) => {
+      setSearch(value);
+    }, 500),
+    []
+  );
 
   const topContent = React.useMemo(() => {
     return (
@@ -217,23 +239,6 @@ export default function MainTable({
             </button>
           </div>
           <div className="flex gap-3">
-            <DropdownMenuNext>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="secondary"
-                  className="flex h-8 gap-2 w-20 p-0 data-[state=open]:bg-muted"
-                >
-                  Status <ChevronDown className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[160px]">
-                {statusOptions.map((status) => (
-                  <DropdownMenuItem key={status.uid} className="cursor-pointer">
-                    {capitalize(status.name)}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenuNext>
             <DropdownMenuNext>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -310,15 +315,14 @@ export default function MainTable({
           variant="light"
           onChange={setPage}
         />
-        <span className="text-small text-default-400">
+        {/* <span className="text-small text-default-400">
           {selectedKeys === "all"
             ? "All items selected"
             : `${selectedKeys.size} of ${filteredItems.length} selected`}
-        </span>
+        </span> */}
       </div>
     );
   }, [
-    selectedKeys,
     filteredItems.length,
     page,
     pages,
@@ -348,18 +352,10 @@ export default function MainTable({
       aria-label="Example table with custom cells, pagination and sorting"
       bottomContent={bottomContent}
       bottomContentPlacement="outside"
-      checkboxesProps={{
-        classNames: {
-          wrapper: "after:bg-foreground after:text-background text-background",
-        },
-      }}
       classNames={classNames}
-      selectedKeys={selectedKeys}
-      selectionMode="multiple"
       sortDescriptor={sortDescriptor}
       topContent={topContent}
       topContentPlacement="outside"
-      onSelectionChange={setSelectedKeys}
       onSortChange={setSortDescriptor}
     >
       <TableHeader columns={headerColumns}>

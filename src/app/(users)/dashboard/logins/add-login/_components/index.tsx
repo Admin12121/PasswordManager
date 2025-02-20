@@ -163,7 +163,7 @@ const LoginForm = () => {
     } catch (error) {
       console.error("Error:", error);
     }
-  }, []);
+  }, [user]);
 
   const generatePassword = () => {
     setGeneratePassword(true);
@@ -198,13 +198,15 @@ const LoginForm = () => {
     { token: accessToken },
     { skip: !accessToken || !getValues("security") }
   );
+
   const { data, loading } = useDecryptedData(encryptedData, isLoading);
+
   useEffect(() => {
     if (data) {
       setUser(data);
     }
-  }, [data]);
-
+  }, [data, loading]);
+  
   const onSubmitVaultPassword = useCallback(async () => {
     if (!accessToken) return;
     const toastId = toast.loading("Adding...", { position: "top-center" });

@@ -158,7 +158,7 @@ const PasswordGenerator = () => {
           transition={{ type: "spring", duration: 0.5 }}
           className="text-xs text-foreground/60 absolute left-1 bottom-1"
         >
-          copyied
+          copied
         </motion.p>
         <motion.p
           initial={{ y: 100 }}
