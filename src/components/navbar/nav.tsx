@@ -81,7 +81,7 @@ const Nav = () => {
           <a
             target="_blank"
             className="absolute left-1/2 transform -translate-x-1/2 -bottom-9 z-30 block px-2 lg:z-10 lg:px-0"
-            href="https://figma.alignui.com"
+            href="/"
           >
             <div className="hidden mac:flex items-center gap-1 shadow-ln-badge-gray min-[380px]:gap-3 min-[380px]:px-3 h-11 lg:gap-2 rounded-b-[18px] rounded-t-none border-x border-b bg-ln-gray-50 px-4 shadow-none bg-neutral-900/50 backdrop-blur-sm">
               <svg
