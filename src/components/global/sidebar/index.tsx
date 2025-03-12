@@ -47,6 +47,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AccountSwitcher } from "./user_account";
+
+const SidebarSeparator = ({ className, ...props }: { className?: string }) => {
+  return (
+    <div
+      data-sidebar="separator"
+      className={cn("mx-2 w-full bg-neutral-200 dark:bg-muted h-[1px] my-1 ", className)}
+      {...props}
+    />
+  );
+};
 
 interface SidebarProps {
   navCollapsedSize?: number;
@@ -187,6 +198,7 @@ interface Sublink {
 
 export interface SidebarNavProps {
   links: {
+    separator?: boolean;
     group?: string;
     title: string;
     label?: string;
@@ -257,7 +269,8 @@ const SidebarContent = ({
   );
   return (
     <div className={cn("rounded-lg h-full relative w-full ", container)}>
-      {headerContent}
+      {/* {headerContent} */}
+      <AccountSwitcher isCollapsed={isCollapsed}/>
       {SearchContent}
       <div
         data-collapsed={isCollapsed}
@@ -473,6 +486,7 @@ const SidebarContent = ({
                         {link.group}
                       </p>
                     )}
+                    {link.separator && <SidebarSeparator />}
                     <Link
                       href={link.href || "#"}
                       prefetch={link.prefetch ? link.prefetch : false}

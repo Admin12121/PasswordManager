@@ -7,10 +7,10 @@ import {
   MapPin,
   Star,
   LucideIcon,
-  KeyRound 
+  KeyRound,
 } from "lucide-react";
 
-const Wallet = ({className}:{className?:string}) => {
+const Wallet = ({ className }: { className?: string }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -63,6 +63,7 @@ interface Sublink {
   menu?: SublinkMenu[];
 }
 interface links {
+  separator?: boolean;
   group?: string;
   title: string;
   label?: string;
@@ -74,11 +75,11 @@ interface links {
   subLinks?: Sublink[];
   collapsible?: boolean;
   isactive?: boolean;
-};
+}
 
-export const Links:links[] = [
+export const Links: links[] = [
   {
-    title: "Dashboard",
+    title: "Home",
     label: "9",
     icon: Home,
     href: "/dashboard",
@@ -112,6 +113,7 @@ export const Links:links[] = [
     href: "/dashboard/notes",
   },
   {
+    separator: true,
     title: "Password Generator",
     label: "9",
     icon: KeyRound,
@@ -124,5 +126,3 @@ export const Links:links[] = [
     href: "/dashboard/settings",
   },
 ];
-
-
