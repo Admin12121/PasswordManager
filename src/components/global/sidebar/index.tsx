@@ -53,7 +53,7 @@ const SidebarSeparator = ({ className, ...props }: { className?: string }) => {
   return (
     <div
       data-sidebar="separator"
-      className={cn("mx-2 w-full bg-neutral-200 dark:bg-muted h-[1px] my-1 ", className)}
+      className={cn("mr-2 w-full bg-neutral-200 dark:bg-muted h-[1px] my-1 ", className)}
       {...props}
     />
   );

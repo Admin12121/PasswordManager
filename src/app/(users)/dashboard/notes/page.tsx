@@ -1,9 +1,8 @@
-import React from 'react'
+import React from "react";
+import MessageEditor from "./_components";
 
 const Page = () => {
-  return (
-    <div>Page</div>
-  )
-}
+  return <MessageEditor />;
+};
 
-export default Page
+export default Page;

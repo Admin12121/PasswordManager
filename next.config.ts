@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
         hostname: "passwordManager.vickytajpuriya.com",
         pathname: "/media/**",
       },
+      {
+        protocol: "https",
+        hostname: "i.pinimg.com",
+        pathname: "/**",
+      },
     ],
   },
 };
