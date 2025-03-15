@@ -80,7 +80,6 @@ interface links {
 export const Links: links[] = [
   {
     title: "Home",
-    label: "9",
     icon: Home,
     href: "/dashboard",
   },
@@ -96,32 +95,27 @@ export const Links: links[] = [
   },
   {
     title: "Wallet",
-    label: "9",
     icon: Wallet,
     href: "/dashboard/wallet",
   },
   {
     title: "Address",
-    label: "9",
     icon: MapPin,
     href: "/dashboard/address",
   },
   {
     title: "Notes",
-    label: "9",
     icon: NotepadText,
     href: "/dashboard/notes",
   },
   {
     separator: true,
     title: "Password Generator",
-    label: "9",
     icon: KeyRound,
     href: "/dashboard/password-generator",
   },
   {
     title: "Settings",
-    label: "9",
     icon: Settings,
     href: "/dashboard/settings",
   },

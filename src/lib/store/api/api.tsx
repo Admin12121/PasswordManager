@@ -50,10 +50,26 @@ export const userAuthapi = createApi({
         headers: createHeaders(token),
       }),
     }),
+    changepassword: builder.mutation({
+      query: ({ data, token }) => ({
+        url: "api/userauth/users/change_password/",
+        method: "PATCH",
+        body: data,
+        headers: createHeaders(token),
+      }),
+    }),
     verifyvaultpassword: builder.mutation({
       query: ({ data, token }) => ({
         url: "api/userauth/users/verifyvaultpassword/",
         method: "POST",
+        body: data,
+        headers: createHeaders(token),
+      }),
+    }),
+    updatevaultpassword: builder.mutation({
+      query: ({ data, token }) => ({
+        url: "api/userauth/users/vaultpassword/",
+        method: "PATCH",
         body: data,
         headers: createHeaders(token),
       }),
@@ -142,7 +158,9 @@ export const userAuthapi = createApi({
 export const {
   useUserDeviceMutation,
   useSetvaultpasswordMutation,
+  useChangepasswordMutation,
   useVerifyvaultpasswordMutation,
+  useUpdatevaultpasswordMutation,
   useAllUsersQuery,
   useGetLoggedUserQuery,
   useGetUserProfileQuery,

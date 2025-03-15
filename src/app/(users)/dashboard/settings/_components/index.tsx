@@ -1,41 +1,17 @@
 "use client";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import {
-  AlertCircle,
-  Check,
-  ChevronRightIcon,
-  CircleHelp,
-  UserRound,
-} from "lucide-react";
+import { ChevronRightIcon, CircleHelp } from "lucide-react";
 import Profile from "./profile";
 import { useState, useEffect } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useGetLoggedUserQuery } from "@/lib/store/api/api";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { useDecryptedData } from "@/hooks/dec-data";
-import { toast } from "sonner";
-import Link from "next/link";
-
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Changepassword from "./change_password";
 import Two_factor_auth from "./two_factor_authentication";
 import Login_alerts from "./login_alerts";
 import ChangeVaultpassword from "./vaultpassword";
-
-interface AccountSwitcherProps {
-  isCollapsed: boolean;
-}
+import Authenticationverify from "./authentication_verify";
 
 interface UserData {
   email: string;
@@ -48,6 +24,7 @@ interface UserData {
   gender: string | null;
   dob: string | null;
 }
+
 const MainSettings = () => {
   const { accessToken, signOut } = useAuthUser();
   const [user, setUser] = useState<UserData>();
@@ -57,15 +34,20 @@ const MainSettings = () => {
   );
 
   const { data, loading } = useDecryptedData(encryptedData, isLoading);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     if (data) {
       setUser(data);
+      if (!data.totp_secret) {
+        setIsDialogOpen(true);
+      }
     }
   }, [data]);
 
   return (
     <div className="flex items-start gap-5 flex-wrap">
+      {user && <Authenticationverify user={user} isOpen={isDialogOpen} setIsOpen={setIsDialogOpen} />}
       <Profile user={user} />
       <div className="group w-full overflow-hidden max-w-md p-6 rounded-2xl dark:bg-[#1212128a] shadow-xl relative before:border-t-1 before:border-[#fff]">
         <div className="absolute top-0 left-1/2 w-4/5 h-[1px] rounded-full bg-gradient-to-r from-transparent via-[#ffffff95] dark:via-[#ffffff95] to-transparent transform -translate-x-1/2 transition-opacity duration-300 opacity-0 group-hover:opacity-100" />
@@ -80,12 +62,12 @@ const MainSettings = () => {
 
         <div className="rounded-lg overflow-hidden mt-5 shadow-sm">
           <div className="divide-y">
-            <Changepassword />
-            <Two_factor_auth/>
-            <ChangeVaultpassword/>
+            <Changepassword user={user} accessToken={accessToken}/>
+            <Two_factor_auth user={user} accessToken={accessToken}/>
+            <ChangeVaultpassword user={user} accessToken={accessToken}/>
           </div>
         </div>
-        <Login_alerts/>
+        <Login_alerts />
       </div>
       <div className="group w-full overflow-hidden max-w-md p-6 rounded-2xl dark:bg-[#1212128a] shadow-xl relative before:border-t-1 before:border-[#fff]">
         <div className="absolute top-0 left-1/2 w-4/5 h-[1px] rounded-full bg-gradient-to-r from-transparent via-[#ffffff95] dark:via-[#ffffff95] to-transparent transform -translate-x-1/2 transition-opacity duration-300 opacity-0 group-hover:opacity-100" />

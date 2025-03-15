@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
+"use client";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,48 +9,127 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ChevronRightIcon } from "lucide-react";
+import { ChevronRightIcon, Eye, EyeOff, KeyRound } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ReloadIcon } from "@radix-ui/react-icons";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { z } from "zod";
+import { toast } from "sonner";
+import Firststep from "./firststep";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import Spinner from "@/components/ui/spinner";
+import { useUpdatevaultpasswordMutation } from "@/lib/store/api/api";
 
-const CORRECT_CODE = "6548";
+interface UserData {
+  email: string;
+  profile: string | null;
+  username: string;
+}
 
-const ChangeVaultpassword = () => {
-  const [value, setValue] = useState("");
-  const [hasGuessed, setHasGuessed] = useState<boolean | undefined>(undefined);
+const PasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters long")
+      .max(128),
+    confirmpassword: z
+      .string()
+      .min(8, "Password must be at least 8 characters long")
+      .max(128),
+  })
+  .refine((data) => data.password === data.confirmpassword, {
+    message: "Passwords do not match",
+    path: ["confirmpassword"],
+  });
+
+type Password = z.infer<typeof PasswordSchema>;
+
+const defaultPasswordSchema: Password = {
+  password: "",
+  confirmpassword: "",
+};
+
+const ChangeVaultpassword = ({
+  user,
+  accessToken,
+}: {
+  user?: UserData;
+  accessToken?: string;
+}) => {
   const [step, setStep] = useState(1);
+  const [isVisible, setIsVisible] = useState(false);
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [updatevaultpassword] = useUpdatevaultpasswordMutation();
+  const [generatingPasswordLoader, setGeneratingPasswordLoader] =
+    useState(false);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const vaultPasswordForm = useForm<Password>({
+    resolver: zodResolver(PasswordSchema),
+    mode: "onChange",
+    defaultValues: defaultPasswordSchema,
+  });
 
-  useEffect(() => {
-    if (hasGuessed) closeButtonRef.current?.focus();
-  }, [hasGuessed]);
+  const toggleVisibility = () => setIsVisible((prev) => !prev);
+  const toggleConfirmVisibility = () => setConfirmVisible((prev) => !prev);
+  const { setValue, handleSubmit } = vaultPasswordForm;
 
-  async function onSubmit(e?: React.FormEvent<HTMLFormElement>) {
-    e?.preventDefault();
-    setHasGuessed(value === CORRECT_CODE);
-    setValue("");
+  const generatePassword = () => {
+    setGeneratingPasswordLoader(true);
+    const chars =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+[]{}|;:,.<>?";
+    let newPassword = Array.from(
+      { length: 40 },
+      () => chars[Math.floor(Math.random() * chars.length)]
+    ).join("");
 
     setTimeout(() => {
-      if (value === CORRECT_CODE) {
-        setStep(2);
-      }
-      inputRef.current?.blur();
-    }, 500);
-  }
+      setValue("password", newPassword);
+      setValue("confirmpassword", newPassword);
+      setGeneratingPasswordLoader(false);
+    }, 1000);
+  };
+
+  const onSubmitVaultPassword = async (data: Password) => {
+    if (!accessToken) return;
+    const toastId = toast.loading("Adding...", { position: "top-center" });
+
+    try {
+      const res = await ChangeVaultpassword({data:data.password, token: accessToken});
+      toast.success("Password Changed", {
+        id: toastId,
+        position: "top-center",
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("An unknown error occurred", {
+        id: toastId,
+        position: "top-center",
+      });
+    }
+  };
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          className="group h-auto gap-4 py-3 text-left w-full  border-none rounded-none justify-between"
+          className="group h-auto gap-4 py-3 text-left w-full border-none rounded-none justify-between"
           variant="outline"
         >
           <div className="space-y-1">
-            <h3>vault password</h3>
+            <h3>Vault Password</h3>
           </div>
           <ChevronRightIcon
             className="opacity-60 transition-transform group-hover:translate-x-0.5"
@@ -62,58 +141,8 @@ const ChangeVaultpassword = () => {
 
       <DialogContent className="min-w-[550px] !rounded-3xl">
         <AnimatePresence mode="wait">
-          {step === 1 && (
-            <motion.div
-              key="otp-step"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.5 }}
-              className="space-y-4"
-            >
-              <DialogHeader className="space-y-0">
-                <p>vicky__tajpuriya.password_manager</p>
-                <DialogTitle className="text-2xl m-0">
-                  Check your email
-                </DialogTitle>
-                <DialogDescription>
-                  Enter the code we sent to v***********9@gmail.com
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="flex justify-center">
-                <Input
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                  className="bg-muted h-10"
-                  placeholder="Enter OTP"
-                  id="otp"
-                  required
-                />
-              </div>
-
-              {hasGuessed === false && (
-                <p
-                  className="text-muted-foreground text-center text-xs"
-                  role="alert"
-                >
-                  Invalid code. Please try again.
-                </p>
-              )}
-
-              <p className="text-sm">
-                <a className="hover:underline flex items-center gap-2" href="#">
-                  <ReloadIcon /> We can send a new code in 0.08
-                </a>
-              </p>
-
-              <Button
-                onClick={() => onSubmit()}
-                className="w-full dark:hover:text-white"
-              >
-                Continue
-              </Button>
-            </motion.div>
+          {step === 1 && accessToken && (
+            <Firststep token={accessToken} user={user} setStep={setStep} />
           )}
 
           {step === 2 && (
@@ -125,37 +154,114 @@ const ChangeVaultpassword = () => {
               transition={{ duration: 0.5 }}
               className="space-y-5"
             >
-              <DialogHeader className="space-y-0">
-                <p>vicky__tajpuriya.password_manager</p>
-                <DialogTitle className="text-2xl m-0">
-                  Create Vault Password
-                </DialogTitle>
-                <DialogDescription>
-                  Your password must be at least 8 characters and include a
-                  combination of numbers, letters, and special characters
-                  (!$@%).
-                </DialogDescription>
-              </DialogHeader>
+              <Form {...vaultPasswordForm}>
+                <form
+                  onSubmit={handleSubmit(onSubmitVaultPassword)}
+                  className="flex gap-3 w-full flex-col"
+                >
+                  <DialogHeader className="space-y-0">
+                    <p>vicky__tajpuriya.password_manager</p>
+                    <DialogTitle className="text-2xl m-0">
+                      Create Vault Password
+                    </DialogTitle>
+                    <DialogDescription>
+                      Your password must be at least 8 characters and include a
+                      combination of numbers, letters, and special characters
+                      (!$@%).
+                    </DialogDescription>
+                  </DialogHeader>
 
-              <form className="space-y-4">
-                <Input
-                  className="bg-muted h-10"
-                  id="new_password"
-                  placeholder="New password"
-                  type="password"
-                  required
-                />
-                <Input
-                  className="bg-muted h-10"
-                  id="confirm_password"
-                  placeholder="Re-type new password"
-                  type="password"
-                  required
-                />
-                <Button type="submit" className="w-full dark:hover:text-white">
-                  Create new vault password
-                </Button>
-              </form>
+                  <FormField
+                    control={vaultPasswordForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              className="pe-9 bg-muted h-10"
+                              placeholder="New Password"
+                              type={isVisible ? "text" : "password"}
+                              {...field}
+                              autoComplete="off"
+                            />
+                            <button
+                              className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center"
+                              type="button"
+                              onClick={toggleVisibility}
+                            >
+                              {isVisible ? (
+                                <EyeOff size={16} />
+                              ) : (
+                                <Eye size={16} />
+                              )}
+                            </button>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <button
+                                    className="absolute inset-y-0 end-7 flex h-full w-9 items-center justify-center"
+                                    type="button"
+                                    onClick={generatePassword}
+                                  >
+                                    {generatingPasswordLoader ? (
+                                      <Spinner
+                                        size="sm"
+                                        className="dark:!stroke-white"
+                                      />
+                                    ) : (
+                                      <KeyRound size={16} />
+                                    )}
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Generate password</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={vaultPasswordForm.control}
+                    name="confirmpassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              className="bg-muted h-10 pe-9"
+                              placeholder="Re-type new password"
+                              type={confirmVisible ? "text" : "password"}
+                              {...field}
+                            />
+                            <button
+                              className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center"
+                              type="button"
+                              onClick={toggleConfirmVisibility}
+                            >
+                              {confirmVisible ? (
+                                <EyeOff size={16} />
+                              ) : (
+                                <Eye size={16} />
+                              )}
+                            </button>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button type="submit" className="w-full">
+                    Submit
+                  </Button>
+                </form>
+              </Form>
             </motion.div>
           )}
         </AnimatePresence>

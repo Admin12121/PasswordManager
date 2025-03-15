@@ -5,8 +5,6 @@ import {
   Bold,
   Italic,
   Underline,
-  List,
-  ListOrdered,
   Quote,
   Code,
   RotateCcw,
@@ -121,7 +119,10 @@ export default function MessageEditor() {
   const [textFormat, setTextFormat] = useState("body1")
   const [activeFormats, setActiveFormats] = useState<string[]>([])
   const [isTextSelected, setIsTextSelected] = useState(false)
-  const [selectionPosition, setSelectionPosition] = useState({ top: 0, left: 0 })
+  const [selectionPosition, setSelectionPosition] = useState({
+    top: 0,
+    left: 0,
+  })
   const [selectedColor, setSelectedColor] = useState("#000000")
   const [selectedHighlight, setSelectedHighlight] = useState("#FFFF00")
   const editorRef = useRef<HTMLDivElement>(null)
@@ -185,7 +186,7 @@ export default function MessageEditor() {
       } else if (format === "quote") {
         const selectedContent = range.extractContents()
         const blockquote = document.createElement("blockquote")
-        blockquote.style.borderLeft = "4px solid #e5e7eb"
+        blockquote.style.borderLeft = "4px solid var(--border-color)"
         blockquote.style.paddingLeft = "10px"
         blockquote.style.fontStyle = "italic"
         blockquote.appendChild(selectedContent)
@@ -194,7 +195,7 @@ export default function MessageEditor() {
         const selectedContent = range.extractContents()
         const code = document.createElement("code")
         code.style.fontFamily = "monospace"
-        code.style.backgroundColor = "#f3f4f6"
+        code.style.backgroundColor = "var(--code-bg)"
         code.style.padding = "2px 4px"
         code.style.borderRadius = "4px"
         code.appendChild(selectedContent)
@@ -268,7 +269,7 @@ export default function MessageEditor() {
   // Handle clearing the editor safely
   const clearEditor = () => {
     if (editorRef.current) {
-      editorRef.current.innerHTML = '<span class="text-gray-400">Type your message here...</span>'
+      editorRef.current.innerHTML = '<span class="text-muted-foreground">Type your message here...</span>'
       setMessage("")
     }
   }
@@ -277,23 +278,28 @@ export default function MessageEditor() {
   useEffect(() => {
     if (editorRef.current && !editorRef.current.innerHTML) {
       editorRef.current.innerHTML = message
-        ? `These are the files you asked for <span class="text-blue-500 bg-blue-50/50 px-1 rounded">@oliviarox</span> <span class="text-xl leading-none">😀</span>`
-        : '<span class="text-gray-400">Type your message here...</span>'
+        ? `These are the files you asked for <span class="text-blue-500 bg-blue-50/50 dark:bg-blue-950/30 px-1 rounded">@oliviarox</span> <span class="text-xl leading-none">😀</span>`
+        : '<span class="text-muted-foreground">Type your message here...</span>'
     }
   }, [message])
 
+
   return (
-      <div className="w-full max-w-2xl bg-white rounded-3xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.08)] border border-gray-100">
+    <div className="flex items-center justify-center h-dvh bg-gradient-to-br from-background to-muted/50 dark:from-background dark:to-background/80">
+      <div className="w-full max-w-2xl bg-card rounded-3xl shadow-lg dark:shadow-none border border-border dark:border-border/30 backdrop-blur-sm backdrop-saturate-150 dark:bg-card/95">
+        {/* Glass effect overlay */}
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/5 to-white/20 dark:from-white/5 dark:to-transparent opacity-50 pointer-events-none" />
+
         {/* Formatting Toolbar */}
-        <div className="flex items-center p-2 border-b border-gray-100">
-          <div className="flex items-center border border-gray-200 rounded-2xl p-[5px] bg-gray-100/80">
+        <div className="flex items-center p-2 border-b border-border/50 dark:border-border/20 relative">
+          <div className="flex items-center border border-border/50 dark:border-border/20 rounded-2xl p-[5px] bg-muted/50 dark:bg-muted/10 backdrop-blur-sm">
             <div className="flex items-center mr-2">
               <Select value={textFormat} onValueChange={setTextFormat}>
-                <SelectTrigger className="relative overflow-hidden h-10 px-4 text-gray-700 font-medium rounded-xl flex items-center gap-1 bg-gray-50/80 hover:bg-gray-50 shadow-[0_1px_2px_rgba(0,0,0,0.08)] border border-gray-100 w-[100px]">
-                <div className="absolute top-0 left-1/2 w-full h-[2px] rounded-full bg-white transform -translate-x-1/2" />
+                <SelectTrigger className="relative overflow-hidden h-10 px-4 text-foreground font-medium rounded-xl flex items-center gap-1 bg-background/80 dark:bg-background/50 hover:bg-background/90 dark:hover:bg-background/60 shadow-sm border border-border/50 dark:border-border/30 w-[100px]">
+                  <div className="absolute top-0 left-1/2 w-full h-[2px] rounded-full bg-primary/10 transform -translate-x-1/2" />
                   <SelectValue placeholder="Body 1" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="border-border/50 dark:border-border/30 bg-background/95 dark:bg-background/90 backdrop-blur-md">
                   <SelectItem value="body1">Body 1</SelectItem>
                   <SelectItem value="body2">Body 2</SelectItem>
                   <SelectItem value="heading1">Heading 1</SelectItem>
@@ -302,61 +308,73 @@ export default function MessageEditor() {
               </Select>
             </div>
 
-            <div className="flex items-center border-l border-gray-200 pl-2 gap-0.5">
+            <div className="flex items-center border-l border-border/50 dark:border-border/20 pl-2 gap-0.5">
               <Button
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "relative h-10 w-10 rounded-xl text-gray-600 hover:bg-white",
-                  isFormatActive("bold") && "bg-gray-50 shadow-[0_1px_2px_rgba(0,0,0,0.08)] border border-gray-100",
+                  "relative h-10 w-10 rounded-xl text-foreground hover:bg-background/80 dark:hover:bg-background/30",
+                  isFormatActive("bold") &&
+                    "bg-background/80 dark:bg-background/30 shadow-sm border border-border/50 dark:border-border/30",
                 )}
                 onClick={() => toggleFormat("bold")}
               >
-                {isFormatActive("bold") && <div className="absolute top-0 left-1/2 w-full h-[2px] rounded-full bg-white transform -translate-x-1/2" />}
+                {isFormatActive("bold") && (
+                  <div className="absolute top-0 left-1/2 w-full h-[2px] rounded-full bg-primary/10 transform -translate-x-1/2" />
+                )}
                 <Bold className="h-[18px] w-[18px]" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "h-10 w-10 rounded-xl text-gray-600 hover:bg-white",
+                  "relative h-10 w-10 rounded-xl text-foreground hover:bg-background/80 dark:hover:bg-background/30",
                   isFormatActive("italic") &&
-                    "bg-gray-50/80 shadow-[0_1px_2px_rgba(0,0,0,0.08)] border border-gray-100",
+                    "bg-background/80 dark:bg-background/30 shadow-sm border border-border/50 dark:border-border/30",
                 )}
                 onClick={() => toggleFormat("italic")}
               >
+                {isFormatActive("italic") && (
+                  <div className="absolute top-0 left-1/2 w-full h-[2px] rounded-full bg-primary/10 transform -translate-x-1/2" />
+                )}
                 <Italic className="h-[18px] w-[18px]" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "h-10 w-10 rounded-xl text-gray-600 hover:bg-white",
+                  "relative h-10 w-10 rounded-xl text-foreground hover:bg-background/80 dark:hover:bg-background/30",
                   isFormatActive("underline") &&
-                    "bg-gray-50/80 shadow-[0_1px_2px_rgba(0,0,0,0.08)] border border-gray-100",
+                    "bg-background/80 dark:bg-background/30 shadow-sm border border-border/50 dark:border-border/30",
                 )}
                 onClick={() => toggleFormat("underline")}
               >
+                {isFormatActive("underline") && (
+                  <div className="absolute top-0 left-1/2 w-full h-[2px] rounded-full bg-primary/10 transform -translate-x-1/2" />
+                )}
                 <Underline className="h-[18px] w-[18px]" />
               </Button>
             </div>
 
-            <div className="flex items-center border-l border-gray-200 pl-2 gap-0.5 ml-2">
-              
+            <div className="flex items-center border-l border-border/50 dark:border-border/20 pl-2 gap-0.5 ml-2">
               {/* Emoji button */}
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-gray-600 hover:bg-white">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10 rounded-xl text-foreground hover:bg-background/80 dark:hover:bg-background/30"
+                  >
                     <Smile className="h-[18px] w-[18px]" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-64 p-2">
+                <PopoverContent className="w-64 p-2 bg-popover/95 dark:bg-popover/90 backdrop-blur-md border border-border/50 dark:border-border/30">
                   <div className="grid grid-cols-10 gap-1">
                     {emojis.map((emoji, index) => (
                       <Button
                         key={index}
                         variant="ghost"
-                        className="h-8 w-8 p-0 hover:bg-gray-100"
+                        className="h-8 w-8 p-0 hover:bg-muted/70 dark:hover:bg-muted/30"
                         onClick={() => insertEmoji(emoji)}
                       >
                         {emoji}
@@ -372,25 +390,28 @@ export default function MessageEditor() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-10 w-10 rounded-xl text-gray-600 hover:bg-white relative"
+                    className="h-10 w-10 rounded-xl text-foreground hover:bg-background/80 dark:hover:bg-background/30 relative"
                   >
                     <Palette className="h-[18px] w-[18px]" />
                     <div
-                      className="absolute bottom-1 right-1 w-2 h-2 rounded-full"
+                      className="absolute bottom-1 right-1 w-2 h-2 rounded-full ring-1 ring-border/30 dark:ring-white/20"
                       style={{ backgroundColor: selectedColor }}
                     />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-64 p-2">
+                <PopoverContent className="w-64 p-2 bg-popover/95 dark:bg-popover/90 backdrop-blur-md border border-border/50 dark:border-border/30">
                   <div className="grid grid-cols-5 gap-1">
                     {colors.map((color, index) => (
                       <Button
                         key={index}
                         variant="ghost"
-                        className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md"
+                        className="h-8 w-8 p-0 hover:bg-muted/70 dark:hover:bg-muted/30 rounded-md"
                         onClick={() => applyTextColor(color)}
                       >
-                        <div className="w-6 h-6 rounded-sm" style={{ backgroundColor: color }} />
+                        <div
+                          className="w-6 h-6 rounded-sm ring-1 ring-border/30 dark:ring-white/10"
+                          style={{ backgroundColor: color }}
+                        />
                       </Button>
                     ))}
                   </div>
@@ -403,25 +424,28 @@ export default function MessageEditor() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-10 w-10 rounded-xl text-gray-600 hover:bg-white relative"
+                    className="h-10 w-10 rounded-xl text-foreground hover:bg-background/80 dark:hover:bg-background/30 relative"
                   >
                     <Highlighter className="h-[18px] w-[18px]" />
                     <div
-                      className="absolute bottom-1 right-1 w-2 h-2 rounded-full"
+                      className="absolute bottom-1 right-1 w-2 h-2 rounded-full ring-1 ring-border/30 dark:ring-white/20"
                       style={{ backgroundColor: selectedHighlight }}
                     />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-64 p-2">
+                <PopoverContent className="w-64 p-2 bg-popover/95 dark:bg-popover/90 backdrop-blur-md border border-border/50 dark:border-border/30">
                   <div className="grid grid-cols-5 gap-1">
                     {highlightColors.map((color, index) => (
                       <Button
                         key={index}
                         variant="ghost"
-                        className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md"
+                        className="h-8 w-8 p-0 hover:bg-muted/70 dark:hover:bg-muted/30 rounded-md"
                         onClick={() => applyHighlight(color)}
                       >
-                        <div className="w-6 h-6 rounded-sm" style={{ backgroundColor: color }} />
+                        <div
+                          className="w-6 h-6 rounded-sm ring-1 ring-border/30 dark:ring-white/10"
+                          style={{ backgroundColor: color }}
+                        />
                       </Button>
                     ))}
                   </div>
@@ -429,13 +453,12 @@ export default function MessageEditor() {
               </Popover>
             </div>
 
-            <div className="flex items-center border-l border-gray-200 pl-2 gap-0.5 ml-2">
+            <div className="flex items-center border-l border-border/50 dark:border-border/20 pl-2 gap-0.5 ml-2">
               <Button
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "h-10 w-10 rounded-xl text-gray-600 hover:bg-white",
-                  isFormatActive("quote") && "bg-gray-50/80 shadow-[0_1px_2px_rgba(0,0,0,0.08)] border border-gray-100",
+                  "h-10 w-10 rounded-xl text-foreground hover:bg-background/80 dark:hover:bg-background/30",
                 )}
                 onClick={() => toggleFormat("quote")}
               >
@@ -445,8 +468,7 @@ export default function MessageEditor() {
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "h-10 w-10 rounded-xl text-gray-600 hover:bg-white",
-                  isFormatActive("code") && "bg-gray-50/80 shadow-[0_1px_2px_rgba(0,0,0,0.08)] border border-gray-100",
+                  "h-10 w-10 rounded-xl text-foreground hover:bg-background/80 dark:hover:bg-background/30",
                 )}
                 onClick={() => toggleFormat("code")}
               >
@@ -455,7 +477,7 @@ export default function MessageEditor() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10 rounded-xl text-gray-600 hover:bg-white"
+                className="h-10 w-10 rounded-xl text-foreground hover:bg-background/80 dark:hover:bg-background/30"
                 onClick={() => {
                   if (editorRef.current) {
                     document.execCommand("removeFormat", false)
@@ -465,17 +487,16 @@ export default function MessageEditor() {
               >
                 <RotateCcw className="h-[18px] w-[18px]" />
               </Button>
-
             </div>
           </div>
           <div className="ml-auto">
             <Button
               variant="ghost"
               size="icon"
-              className="h-12 w-12 rounded-xl bg-red-50/80 text-red-500 hover:bg-red-100/80 hover:text-red-600"
+              className="h-12 w-12 rounded-xl bg-red-100/80 dark:bg-red-900/20 text-red-500 dark:text-red-400 hover:bg-red-200/80 dark:hover:bg-red-900/30 backdrop-blur-sm"
               onClick={clearEditor}
             >
-              <Trash2 className="h-[24px] w-[24px]" />
+              <Trash2 className="h-[20px] w-[20px]" />
             </Button>
           </div>
         </div>
@@ -485,13 +506,16 @@ export default function MessageEditor() {
           {/* Floating alignment toolbar */}
           {isTextSelected && (
             <div
-              className="absolute bg-white shadow-md rounded-lg p-1 flex gap-1 z-10"
-              style={{ top: `${selectionPosition.top}px`, left: `${selectionPosition.left}px` }}
+              className="absolute bg-popover/95 dark:bg-popover/90 shadow-lg dark:shadow-xl rounded-lg p-1 flex gap-1 z-10 border border-border/50 dark:border-border/30 backdrop-blur-md"
+              style={{
+                top: `${selectionPosition.top}px`,
+                left: `${selectionPosition.left}px`,
+              }}
             >
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-lg text-gray-600 hover:bg-gray-100"
+                className="h-8 w-8 rounded-lg text-foreground hover:bg-muted/70 dark:hover:bg-muted/30"
                 onClick={() => applyAlignment("left")}
               >
                 <AlignLeft className="h-4 w-4" />
@@ -499,7 +523,7 @@ export default function MessageEditor() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-lg text-gray-600 hover:bg-gray-100"
+                className="h-8 w-8 rounded-lg text-foreground hover:bg-muted/70 dark:hover:bg-muted/30"
                 onClick={() => applyAlignment("center")}
               >
                 <AlignCenter className="h-4 w-4" />
@@ -507,7 +531,7 @@ export default function MessageEditor() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-lg text-gray-600 hover:bg-gray-100"
+                className="h-8 w-8 rounded-lg text-foreground hover:bg-muted/70 dark:hover:bg-muted/30"
                 onClick={() => applyAlignment("right")}
               >
                 <AlignRight className="h-4 w-4" />
@@ -520,7 +544,7 @@ export default function MessageEditor() {
               ref={editorRef}
               contentEditable
               className={cn(
-                "text-gray-800 text-[15px] outline-none focus:outline-none min-h-[140px] rounded-lg border-transparent focus:border-gray-200",
+                "text-foreground text-[15px] outline-none focus:outline-none min-h-[140px] rounded-lg border-transparent focus:border-border/50 dark:focus:border-border/30 p-2 transition-all duration-200",
                 textFormat === "heading1" && "text-2xl font-bold",
                 textFormat === "heading2" && "text-xl font-bold",
                 textFormat === "body2" && "text-sm",
@@ -532,40 +556,40 @@ export default function MessageEditor() {
         </div>
 
         {/* Bottom Toolbar */}
-        <div className="flex items-center p-2 border-t border-gray-100">
+        <div className="flex items-center p-2 border-t border-border/50 dark:border-border/20 relative">
           <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-xl text-gray-400 hover:bg-gray-100 bg-gray-50/50"
+              className="h-10 w-10 rounded-xl text-muted-foreground hover:bg-muted/70 dark:hover:bg-muted/30 bg-muted/30 dark:bg-muted/10"
             >
               <Plus className="h-5 w-5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-xl text-gray-400 hover:bg-gray-100 bg-gray-50/50"
+              className="h-10 w-10 rounded-xl text-muted-foreground hover:bg-muted/70 dark:hover:bg-muted/30 bg-muted/30 dark:bg-muted/10"
             >
               <Mic className="h-5 w-5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-xl text-gray-400 hover:bg-gray-100 bg-gray-50/50"
+              className="h-10 w-10 rounded-xl text-muted-foreground hover:bg-muted/70 dark:hover:bg-muted/30 bg-muted/30 dark:bg-muted/10"
             >
               <Video className="h-5 w-5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-xl text-gray-400 hover:bg-gray-100 bg-gray-50/50"
+              className="h-10 w-10 rounded-xl text-muted-foreground hover:bg-muted/70 dark:hover:bg-muted/30 bg-muted/30 dark:bg-muted/10"
             >
               <Maximize2 className="h-5 w-5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-xl text-gray-400 hover:bg-gray-100 bg-gray-50/50"
+              className="h-10 w-10 rounded-xl text-muted-foreground hover:bg-muted/70 dark:hover:bg-muted/30 bg-muted/30 dark:bg-muted/10"
             >
               <MoreHorizontal className="h-5 w-5" />
             </Button>
@@ -575,20 +599,21 @@ export default function MessageEditor() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-xl text-gray-400 hover:bg-gray-100 bg-gray-50/50"
+              className="h-10 w-10 rounded-xl text-muted-foreground hover:bg-muted/70 dark:hover:bg-muted/30 bg-muted/30 dark:bg-muted/10"
             >
-              <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-gray-400 border-b-[6px] border-b-transparent ml-0.5"></div>
+              <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-muted-foreground border-b-[6px] border-b-transparent ml-0.5"></div>
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-xl text-gray-400 hover:bg-gray-100 bg-gray-50/50"
+              className="h-10 w-10 rounded-xl text-muted-foreground hover:bg-muted/70 dark:hover:bg-muted/30 bg-muted/30 dark:bg-muted/10"
             >
               <ChevronDown className="h-5 w-5" />
             </Button>
           </div>
         </div>
       </div>
+    </div>
   )
 }
 
