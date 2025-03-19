@@ -29,7 +29,7 @@ const Providers = ({ children, collapsed, layout }: ProvidersProps) => {
         <SidebarHeader logo="/profile.png" label="Password Manager" />
         <SidebarFooter className="border-t left-0">
           <div className="flex flex-row items-center p-2 w-full">
-            <ThemeSwitch />
+            <ThemeSwitch  showLabel variant="circle" start="bottom-left" />
           </div>
         </SidebarFooter>
       </SidebarContent>

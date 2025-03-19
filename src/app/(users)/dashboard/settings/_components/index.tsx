@@ -12,21 +12,11 @@ import Two_factor_auth from "./two_factor_authentication";
 import Login_alerts from "./login_alerts";
 import ChangeVaultpassword from "./vaultpassword";
 import Authenticationverify from "./authentication_verify";
-
-interface UserData {
-  email: string;
-  profile: string | null;
-  phone: string | null;
-  username: string;
-  last_name: string;
-  first_name: string;
-  role: string;
-  gender: string | null;
-  dob: string | null;
-}
+import { UserData } from "@/schemas";
+import FeedBack from "./sendfeedback";
 
 const MainSettings = () => {
-  const { accessToken, signOut } = useAuthUser();
+  const { accessToken } = useAuthUser();
   const [user, setUser] = useState<UserData>();
   const { data: encryptedData, isLoading } = useGetLoggedUserQuery(
     { token: accessToken },
@@ -47,7 +37,13 @@ const MainSettings = () => {
 
   return (
     <div className="flex items-start gap-5 flex-wrap">
-      {user && <Authenticationverify user={user} isOpen={isDialogOpen} setIsOpen={setIsDialogOpen} />}
+      {user && isDialogOpen && (
+        <Authenticationverify
+          user={user}
+          isOpen={isDialogOpen}
+          setIsOpen={setIsDialogOpen}
+        />
+      )}
       <Profile user={user} />
       <div className="group w-full overflow-hidden max-w-md p-6 rounded-2xl dark:bg-[#1212128a] shadow-xl relative before:border-t-1 before:border-[#fff]">
         <div className="absolute top-0 left-1/2 w-4/5 h-[1px] rounded-full bg-gradient-to-r from-transparent via-[#ffffff95] dark:via-[#ffffff95] to-transparent transform -translate-x-1/2 transition-opacity duration-300 opacity-0 group-hover:opacity-100" />
@@ -62,9 +58,9 @@ const MainSettings = () => {
 
         <div className="rounded-lg overflow-hidden mt-5 shadow-sm">
           <div className="divide-y">
-            <Changepassword user={user} accessToken={accessToken}/>
-            <Two_factor_auth user={user} accessToken={accessToken}/>
-            <ChangeVaultpassword user={user} accessToken={accessToken}/>
+            <Changepassword user={user} accessToken={accessToken} />
+            <Two_factor_auth user={user} accessToken={accessToken} />
+            <ChangeVaultpassword user={user} accessToken={accessToken} />
           </div>
         </div>
         <Login_alerts />
@@ -108,19 +104,7 @@ const MainSettings = () => {
                 aria-hidden="true"
               />
             </Button>
-            <Button
-              className="group h-auto gap-4 py-3 text-left w-full  border-none rounded-none justify-between"
-              variant="outline"
-            >
-              <div className="space-y-1">
-                <h3>Send Feedback</h3>
-              </div>
-              <ChevronRightIcon
-                className="opacity-60 transition-transform group-hover:translate-x-0.5"
-                size={16}
-                aria-hidden="true"
-              />
-            </Button>
+            <FeedBack />
           </div>
         </div>
       </div>

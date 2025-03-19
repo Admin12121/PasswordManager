@@ -10,9 +10,34 @@ export default {
     "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    container: {
+      center: true,
+      padding: "1rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
     extend: {
-      screens:{
-        'mac': "1360px"
+      screens: {
+        mac: "1360px",
+        sm: "660px",
+        "max-sm": { max: "639px" },
+        "max-sm-2": { max: "660px" },
+        md: "768px",
+        "max-md": { max: "767px" },
+        "custom-md": { min: "800px", max: "1100px" },
+        mmd: "1000px",
+        "mid-mmd": { max: "900px" },
+        "max-mmd": { max: "1000px" },
+        lg: "1024px",
+        "max-lg": { max: "1100px" },
+        "max-llg": { max: "1120px" },
+        xxl: "1200px",
+        xl: "1280px",
+        "max-2xl": { max: "1400px" },
+        "2xl": "1536px",
+        "3xl": "1636px",
+        "4xl": "1736px",
       },
       fontFamily: {
         sans: ["var(--font-sans)"],
@@ -84,5 +109,5 @@ export default {
       },
     },
   },
-  plugins: [heroui() ,require("tailwindcss-animate")],
+  plugins: [heroui(), require("tailwindcss-animate")],
 } satisfies Config;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -23,13 +23,7 @@ import {
 } from "@/components/ui/form";
 import { z } from "zod";
 import { delay } from "@/lib/utils";
-import { encryptData } from "@/hooks/dec-data";
-
-interface UserData {
-  email: string;
-  profile: string | null;
-  username: string;
-}
+import { UserData } from "@/schemas";
 
 const TotpSchema = z.object({
   token: z
@@ -48,6 +42,23 @@ const defaultVaultPasswordValues: Totpd = {
   token: "",
   secret: "",
 };
+
+function xorEncryptDecrypt(data: string, key: string) {
+  return Array.from(data)
+    .map((char: string, index: number) =>
+      String.fromCharCode(
+        char.charCodeAt(0) ^ key.charCodeAt(index % key.length)
+      )
+    )
+    .join("");
+}
+
+function encryptData(data: Record<string, any>, key: string): string {
+  const token = key.slice(0, 32);
+  const jsonData = JSON.stringify(data);
+  const encrypted = xorEncryptDecrypt(jsonData, token);
+  return btoa(encrypted);
+}
 
 const Authenticationverify = ({
   user,
@@ -105,6 +116,7 @@ const Authenticationverify = ({
   useEffect(() => {
     const fetchData = async () => {
       try {
+        await delay(500);
         const response = await fetch("/api/authenticator/generate/", {
           method: "GET",
           headers: {
@@ -112,16 +124,21 @@ const Authenticationverify = ({
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        if (response.ok) {
+        if (response.ok && accessToken) {
           const res = await response.json();
-          setData({ qrCode: res.data.qrCode, secret: res.data.secret });
-          setValue("secret", res.data.secret);
+          const key = accessToken.slice(0, 32);
+          const decodedData = atob(res.data);
+          const decrypted = xorEncryptDecrypt(decodedData, key);
+          const data = JSON.parse(decrypted);
+          setData({ qrCode: data.qrCode, secret: data.secret });
+          setValue("secret", data.secret);
         } else {
           toast.error("Something went wrong", {
             position: "top-center",
           });
         }
       } catch (error: any) {
+        console.log(error);
         toast.error("An error occurred", {
           position: "top-center",
         });
@@ -155,7 +172,7 @@ const Authenticationverify = ({
                 <h1>1. Download as authentication app</h1>
                 <p className="text-sm dark:text-neutral-300">
                   We recommend downloading Duo Mobile or Google Authenticator if
-                  you don't have one installed.
+                  you don&apos;t have one installed.
                 </p>
               </span>
 

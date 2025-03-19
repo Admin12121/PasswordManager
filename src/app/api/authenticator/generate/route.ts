@@ -13,6 +13,13 @@ function xorEncryptDecrypt(data: string, key: string) {
     .join("");
 }
 
+function encryptData(data: Record<string, any>, key: string): string {
+  const token = key.slice(0, 32);
+  const jsonData = JSON.stringify(data);
+  const encrypted = xorEncryptDecrypt(jsonData, token);
+  return btoa(encrypted);
+}
+
 function decryptData(encryptedData: string, key: string): Record<string, any> {
   const token = key.slice(0, 32);
   const decodedData = atob(encryptedData);
@@ -29,6 +36,9 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const token = authorizationHeader.replace("Bearer ", "");
+    const key = token.slice(0, 32);
     const session = await auth()
     const issuer = encodeURIComponent("Password Manager");
     const accountName = encodeURIComponent("https://pm.biki.com.np");
@@ -43,11 +53,12 @@ export async function GET(request: NextRequest) {
     
     const qrCodeData = await QRCode.toDataURL(otpauthUrl);
     
-    const data = {
+    const normdata = {
       secret: secret.base32,
       qrCode: qrCodeData,
     };
-
+    
+    const data = encryptData(normdata, key);
     return NextResponse.json({ data: data }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(

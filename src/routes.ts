@@ -1,21 +1,10 @@
+export const publicRoutes = ["/media/(.*)"];
 
-export const publicRoutes = [
-];
+export const protectedRoutes = ["/dashboard", "/dashboard/(.*)"];
 
-export const protectedRoutes = [
-    "/dashboard",
-    "/dashboard/(.*)",
-];
+export const adminRoutes = ["/users"];
 
-export const adminRoutes = [
-    "/users",
-];
-
-export const authRoutes = [
-    "/auth/login",
-    "/auth/register",
-    "/auth/(.*)",
-];
+export const authRoutes = ["/auth/login", "/auth/register", "/auth/(.*)"];
 
 export const apiAuthPrefix = "/api/auth";
 

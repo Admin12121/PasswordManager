@@ -3,18 +3,7 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-interface UserData {
-  email: string;
-  profile: string | null;
-  phone: string | null;
-  username: string;
-  last_name: string;
-  first_name: string;
-  role: string;
-  gender: string | null;
-  dob: string | null;
-}
+import { UserData } from "@/schemas";
 
 const Profile = ({ user }: { user?: UserData }) => {
   return (

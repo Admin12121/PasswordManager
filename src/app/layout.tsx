@@ -64,7 +64,7 @@ export default async function RootLayout({
     <SessionProvider session={session}>
       <html lang="en" suppressHydrationWarning>
         <body
-          className={`${geistSansLight.variable} ${geistSansRegular.variable} ${geistSansMedium.variable} ${geistSansSemibold.variable} ${geistSansBold.variable} antialiased flex flex-col items-center`}
+          className={`${geistSansLight.variable} ${geistSansRegular.variable} ${geistSansMedium.variable} ${geistSansSemibold.variable} ${geistSansBold.variable}`}
         >
           <NextTopLoader
             color="linear-gradient(to right, #9353d3, #F38CB8, #FDCC92)"

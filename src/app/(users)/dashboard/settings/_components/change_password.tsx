@@ -35,12 +35,7 @@ import {
 import Spinner from "@/components/ui/spinner";
 import { useChangepasswordMutation } from "@/lib/store/api/api";
 import Firststep from "./firststep";
-
-interface UserData {
-  email: string;
-  profile: string | null;
-  username: string;
-}
+import { UserData } from "@/schemas";
 
 const PasswordSchema = z
   .object({
@@ -148,7 +143,6 @@ const Changepassword = ({
           position: "top-center",
         });
       } else if (res.error) {
-        console.log(res.error);
         if ("data" in res.error) {
           const errorData = res.error.data as { error: string };
           toast.error(errorData.error, {

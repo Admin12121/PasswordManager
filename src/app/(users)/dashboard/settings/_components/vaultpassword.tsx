@@ -32,12 +32,7 @@ import {
 } from "@/components/ui/tooltip";
 import Spinner from "@/components/ui/spinner";
 import { useUpdatevaultpasswordMutation } from "@/lib/store/api/api";
-
-interface UserData {
-  email: string;
-  profile: string | null;
-  username: string;
-}
+import { UserData } from "@/schemas";
 
 const PasswordSchema = z
   .object({
@@ -107,11 +102,29 @@ const ChangeVaultpassword = ({
     const toastId = toast.loading("Adding...", { position: "top-center" });
 
     try {
-      const res = await ChangeVaultpassword({data:data.password, token: accessToken});
-      toast.success("Password Changed", {
-        id: toastId,
-        position: "top-center",
+      const res = await updatevaultpassword({
+        data,
+        token: accessToken,
       });
+      if (res.data) {
+        toast.success("Vault Password Changed", {
+          id: toastId,
+          position: "top-center",
+        });
+      } else if (res.error) {
+        if ("data" in res.error) {
+          const errorData = res.error.data as { error: string };
+          toast.error(errorData.error, {
+            id: toastId,
+            position: "top-center",
+          });
+        } else {
+          toast.error("An unknown error occurred", {
+            id: toastId,
+            position: "top-center",
+          });
+        }
+      }
     } catch (error) {
       console.error("Error:", error);
       toast.error("An unknown error occurred", {

@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import { encryptData } from "@/hooks/dec-data";
 import { useRouter } from "next/navigation";
 import { useDecryptedData } from "@/hooks/dec-data";
+import { UserData } from "@/schemas";
 
 const formSchema = z.object({
   title: z
@@ -81,18 +82,6 @@ const defaultFormValues: FormValues = {
   security: false,
 };
 
-interface UserData {
-  email: string;
-  profile: string | null;
-  phone: string | null;
-  username: string;
-  last_name: string;
-  first_name: string;
-  role: string;
-  gender: string | null;
-  dob: string | null;
-  vautpassword: string;
-}
 
 const LoginForm = () => {
   const router = useRouter();
@@ -130,7 +119,7 @@ const LoginForm = () => {
     });
     const newData = encryptData(data, accessToken);
     await delay(500);
-    if(getValues("security") && !user?.vautpassword){
+    if(getValues("security") && !user?.vaultpassword){
       toast.error("Please set vault password", {
         id: toastId,
         position: "top-center",
@@ -414,7 +403,7 @@ const LoginForm = () => {
               </p>
             </div>
           </div>
-          {user && !user?.vautpassword && getValues("security") && <Form {...vaultPasswordForm}>
+          {user && !user?.vaultpassword && getValues("security") && <Form {...vaultPasswordForm}>
             <div className="flex gap-3 w-full items-center flex-col lg:flex-row p-4">
               <div className="space-y-2 relative w-full">
                 <FormField

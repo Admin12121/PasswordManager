@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { delay } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { UserData } from "@/schemas";
 
 const TotpSchema = z.object({
   token: z
@@ -31,11 +32,7 @@ const defaultVaultPasswordValues: Totpd = {
   token: "",
 };
 
-interface UserData {
-  email: string;
-  profile: string | null;
-  username: string;
-}
+
 
 const Firststep = ({
   token,
