@@ -321,12 +321,7 @@ export default function TaskPage() {
   );
 
   return (
-    <div className="h-full flex-1 flex-col space-y-8 p-8 flex">
-      <div className="flex items-center justify-between space-y-2">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Welcome back!</h2>
-        </div>
-      </div>
+    <div className="h-full flex-1 flex-col space-y-8 flex">
       <MainTable
         SetExcludeBy={SetExcludeBy}
         exclude_by={exclude_by}

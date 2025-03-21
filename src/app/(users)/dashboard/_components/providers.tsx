@@ -33,15 +33,15 @@ const Providers = ({ children, collapsed, layout }: ProvidersProps) => {
           </div>
         </SidebarFooter>
       </SidebarContent>
-      <main className="h-svh p-2 w-full">
+      <main className="h-svh pr-2 w-full">
         <div
           className={cn(
             "relative flex h-full flex-1 flex-col ",
             " md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow",
-            "rounded-xl overflow-y-auto"
+            "rounded-xl overflow-y-auto pt-2"
           )}
         >
-          <Header />
+          {/* <Header /> */}
           {children}
         </div>
       </main>

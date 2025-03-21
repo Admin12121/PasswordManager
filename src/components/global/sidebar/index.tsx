@@ -168,7 +168,7 @@ const Sidebar = ({
             </ResizablePanel>
           )}
           {sidebarNav.nav && (
-            <ResizableHandle className="bg-transparent w-2 max-md:hidden" />
+            <ResizableHandle className="bg-transparent w-px max-md:hidden" />
           )}
           <ResizablePanel defaultSize={defaultLayout[1] || 80}>
             {sidebarNav.content}

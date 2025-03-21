@@ -378,7 +378,7 @@ const LoginForm = () => {
             save
           </Button>
         </div>
-        <div className="w-full h-full">
+        <div className="w-full h-full lg:mt-14">
           <div className="relative flex w-full items-start gap-2 rounded-lg p-4 has-[[data-state=checked]]:border-ring">
             <FormField
               control={form.control}

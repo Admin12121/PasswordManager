@@ -1,13 +1,13 @@
 import { cn } from "@/lib/utils";
 import {
-  Home,
   Settings,
   UserRound,
   NotepadText,
   MapPin,
-  Star,
+  Trash,
   LucideIcon,
   KeyRound,
+  Globe,
 } from "lucide-react";
 
 const Wallet = ({ className }: { className?: string }) => {
@@ -79,14 +79,9 @@ interface links {
 
 export const Links: links[] = [
   {
-    title: "Home",
-    icon: Home,
-    href: "/dashboard",
-  },
-  {
-    title: "Favorites",
-    icon: Star,
-    href: "/dashboard/favourites",
+    title: "All",
+    icon: Globe,
+    href: "/dashboard/all",
   },
   {
     title: "Logins",
@@ -110,6 +105,11 @@ export const Links: links[] = [
   },
   {
     separator: true,
+    title: "Trash",
+    icon: Trash,
+    href: "/dashboard/settings",
+  },
+  {
     title: "Password Generator",
     icon: KeyRound,
     href: "/dashboard/password-generator",

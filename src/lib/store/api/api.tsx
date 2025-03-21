@@ -138,6 +138,14 @@ export const userAuthapi = createApi({
         headers: createHeaders(token),
       }),
     }),
+    getVault: builder.query({
+      query: ({ slug, search, page_size, page, exclude_by, token }) => (
+        {
+        url: `/api/vault/logins/vaultdata/${slug ? `${slug}/` : ""}${buildQueryParams({ search, page_size, page, exclude_by })}`,
+        method: "GET",
+        headers: createHeaders(token),
+      }),
+    }),
     updateLogins: builder.mutation({
       query: ({ token, slug }) => ({
         url: `/api/vault/logins/${slug ? `${slug}/` : ""}`,
@@ -168,6 +176,7 @@ export const {
   useChangeUserPasswordMutation,
   useRefreshTokenMutation,
   useGetLoginsQuery,
+  useGetVaultQuery,
   useUpdateLoginsMutation,
   useDeleteLoginsMutation,
 } = userAuthapi;
