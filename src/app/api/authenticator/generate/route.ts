@@ -44,9 +44,16 @@ export async function GET(request: NextRequest) {
     const accountName = encodeURIComponent("https://pm.biki.com.np");
     const logoUrl = encodeURIComponent("https://pm.biki.com.np/profile.png");
 
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: "User email is missing" },
+        { status: 400 }
+      );
+    }
+
     const secret = speakeasy.generateSecret({
       length: 20,
-      name: session?.user?.email!,
+      name: session.user.email!,
     });
 
     const otpauthUrl = `otpauth://totp/${issuer}:${accountName}?secret=${secret.base32}&issuer=${issuer}&image=${logoUrl}`;

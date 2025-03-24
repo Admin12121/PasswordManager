@@ -1,5 +1,6 @@
 import { SiteHeader } from "@/components/navbar/header";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -23,7 +24,7 @@ export default function Home() {
               Prioritize, automate, and stay ahead—AI simplifies your tasks so
               you can focus on what matters most.
             </p>
-            <a
+            <Link
               className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-zinc-600 h-9 px-4 py-2 mt-6 gap-1 md:mt-8 lg:mt-10"
               href="/dashboard"
             >
@@ -42,7 +43,7 @@ export default function Home() {
               >
                 <path d="m9 18 6-6-6-6" />
               </svg>
-            </a>
+            </Link>
           </div>
           <div className="relative w-[159px] p-1 max-lg:hidden border-r-0 border-l 2xl:flex-1">
             <div
@@ -85,7 +86,7 @@ export default function Home() {
               alt="Hero"
               width={1000}
               height={600}
-              className="mx-auto rounded-xl border object-contain p-1 shadow-lg 2xl:max-w-[1092px] dark:invert"
+              className="mx-auto rounded-xl border object-contain p-1 shadow-lg 2xl:max-w-[1092px] "
               style={{ color: "transparent" }}
             />
           </div>
@@ -110,7 +111,7 @@ export default function Home() {
         </p>
         <div className="flex flex-wrap items-center gap-x-8 gap-y-6 opacity-70 grayscale lg:gap-[60px]">
           <div className="flex items-center justify-center">
-            <img
+            <Image
               alt="Notion logo"
               loading="lazy"
               width={109}
@@ -123,7 +124,7 @@ export default function Home() {
             />
           </div>
           <div className="flex items-center justify-center">
-            <img
+            <Image
               alt="GitHub logo"
               loading="lazy"
               width={109}
@@ -136,7 +137,7 @@ export default function Home() {
             />
           </div>
           <div className="flex items-center justify-center">
-            <img
+            <Image
               alt="Slack logo"
               loading="lazy"
               width={109}
@@ -149,7 +150,7 @@ export default function Home() {
             />
           </div>
           <div className="flex items-center justify-center">
-            <img
+            <Image
               alt="Loom logo"
               loading="lazy"
               width={109}
@@ -162,7 +163,7 @@ export default function Home() {
             />
           </div>
           <div className="flex items-center justify-center">
-            <img
+            <Image
               alt="Figma logo"
               loading="lazy"
               width={109}
@@ -387,7 +388,7 @@ export default function Home() {
                         width={400}
                         height={510}
                         data-nimg={1}
-                        className="m-3 rounded-md object-contain shadow-md lg:rounded-xl lg:shadow-lg dark:invert"
+                        className="m-3 rounded-md object-contain shadow-md lg:rounded-xl lg:shadow-lg "
                         style={{ color: "transparent" }}
                       />
                       <div
@@ -724,7 +725,7 @@ export default function Home() {
                   height="743"
                   decoding="async"
                   data-nimg={1}
-                  className="my-2 rounded-md object-contain shadow-md lg:rounded-xl lg:shadow-lg dark:invert"
+                  className="my-2 rounded-md object-contain shadow-md lg:rounded-xl lg:shadow-lg "
                   style={{ color: "transparent" }}
                 />
                 <div
@@ -841,7 +842,7 @@ export default function Home() {
                         height={500}
                         decoding="async"
                         data-nimg={1}
-                        className="m-2 rounded-md object-contain shadow-md lg:rounded-xl lg:shadow-lg dark:invert"
+                        className="m-2 rounded-md object-contain shadow-md lg:rounded-xl lg:shadow-lg "
                         style={{ color: "transparent" }}
                       />
                       <div
@@ -936,7 +937,7 @@ export default function Home() {
                         height={500}
                         decoding="async"
                         data-nimg={1}
-                        className="m-2 rounded-md object-contain shadow-md lg:rounded-xl lg:shadow-lg dark:invert"
+                        className="m-2 rounded-md object-contain shadow-md lg:rounded-xl lg:shadow-lg "
                         style={{ color: "transparent" }}
                       />
                       <div
@@ -1031,7 +1032,7 @@ export default function Home() {
                         height={500}
                         decoding="async"
                         data-nimg={1}
-                        className="m-2 rounded-md object-contain shadow-md lg:rounded-xl lg:shadow-lg dark:invert"
+                        className="m-2 rounded-md object-contain shadow-md lg:rounded-xl lg:shadow-lg "
                         style={{ color: "transparent" }}
                       />
                       <div
@@ -1130,7 +1131,7 @@ export default function Home() {
                         height={500}
                         decoding="async"
                         data-nimg={1}
-                        className="m-2 rounded-md object-contain shadow-md lg:rounded-xl lg:shadow-lg dark:invert"
+                        className="m-2 rounded-md object-contain shadow-md lg:rounded-xl lg:shadow-lg "
                         style={{ color: "transparent" }}
                       />
                       <div
@@ -1197,20 +1198,20 @@ export default function Home() {
       <footer className="border-t">
         <div className="container flex justify-between gap-8 border-x py-4 max-md:flex-col lg:py-8">
           <div className="mb-8 flex-1">
-            <a className="flex items-center gap-1" href="/">
-              <img
+            <Link className="flex items-center gap-1" href="/">
+              <Image
                 alt="logo"
                 loading="lazy"
                 width={32}
                 height={32}
                 decoding="async"
                 data-nimg={1}
-                className="dark:invert"
+                className=""
                 style={{ color: "transparent" }}
                 src="/logo.svg"
               />
               <span className="text-2xl leading-0 font-semibold">Relative</span>
-            </a>
+            </Link>
           </div>
           <div className="flex flex-1 justify-between gap-8 max-sm:flex-col">
             <div>
@@ -1219,10 +1220,10 @@ export default function Home() {
               </h3>
               <ul className="mt-6 space-y-6 text-sm tracking-[-0.28px] lg:mt-8 lg:space-y-8">
                 <li className="hover:text-primary">
-                  <a href="#">Features</a>
+                  <Link href="#">Features</Link>
                 </li>
                 <li className="hover:text-primary">
-                  <a href="#">Pricing</a>
+                  <Link href="#">Pricing</Link>
                 </li>
               </ul>
             </div>
@@ -1232,10 +1233,10 @@ export default function Home() {
               </h3>
               <ul className="mt-6 space-y-6 text-sm tracking-[-0.28px] lg:mt-8 lg:space-y-8">
                 <li className="hover:text-primary">
-                  <a href="/contact">Contact</a>
+                  <Link href="/contact">Contact</Link>
                 </li>
                 <li className="hover:text-primary">
-                  <a href="#">Faq</a>
+                  <Link href="#">Faq</Link>
                 </li>
               </ul>
             </div>
@@ -1245,7 +1246,7 @@ export default function Home() {
               </h3>
               <ul className="mt-6 space-y-6 text-sm tracking-[-0.28px] lg:mt-8 lg:space-y-8">
                 <li className="hover:text-primary">
-                  <a href="/terms-of-service">Terms of Service</a>
+                  <Link href="/terms-of-service">Terms of Service</Link>
                 </li>
               </ul>
             </div>
@@ -1254,7 +1255,7 @@ export default function Home() {
                 Social
               </h3>
               <div className="text-muted-foreground-subtle mt-6 flex gap-3 lg:mt-8">
-                <a aria-label="Instagram" href="https://instagram.com">
+                <Link aria-label="Instagram" href="https://instagram.com">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width={20}
@@ -1271,8 +1272,8 @@ export default function Home() {
                     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
                     <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
                   </svg>
-                </a>
-                <a aria-label="Twitter" href="https://twitter.com">
+                </Link>
+                <Link aria-label="Twitter" href="https://twitter.com">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width={20}
@@ -1287,8 +1288,8 @@ export default function Home() {
                   >
                     <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
                   </svg>
-                </a>
-                <a aria-label="Linkedin" href="https://Linkedin.com">
+                </Link>
+                <Link aria-label="Linkedin" href="https://Linkedin.com">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width={20}
@@ -1305,7 +1306,7 @@ export default function Home() {
                     <rect width={4} height={12} x={2} y={9} />
                     <circle cx={4} cy={4} r={2} />
                   </svg>
-                </a>
+                </Link>
               </div>
             </div>
           </div>

@@ -24,9 +24,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { delay } from "@/lib/utils";
+import { cn, delay } from "@/lib/utils";
 import { useAuthUser } from "@/hooks/use-auth-user";
-import { useGetLoggedUserQuery, useSetvaultpasswordMutation } from "@/lib/store/api/api";
+import {
+  useGetLoggedUserQuery,
+  useSetvaultpasswordMutation,
+} from "@/lib/store/api/api";
 import Options from "./options";
 import Spinner from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
@@ -82,8 +85,15 @@ const defaultFormValues: FormValues = {
   security: false,
 };
 
-
-const LoginForm = () => {
+const LoginForm = ({
+  className,
+  submitButton,
+  security,
+}: {
+  className?: string;
+  submitButton?: string;
+  security?: string;
+}) => {
   const router = useRouter();
   const { accessToken } = useAuthUser();
   const [user, setUser] = useState<UserData>();
@@ -100,7 +110,6 @@ const LoginForm = () => {
     defaultValues: defaultFormValues,
   });
 
-
   const vaultPasswordForm = useForm<VaultPassword>({
     resolver: zodResolver(vaultPasswordSchema),
     mode: "onChange",
@@ -109,50 +118,53 @@ const LoginForm = () => {
 
   const { reset, setValue, getValues } = form;
 
-  const onSubmit = useCallback(async (data: FormValues) => {
-    if (!accessToken) return;
-    const toastId = toast.loading("Adding...", { position: "top-center" });
-    await delay(500);
-    toast.success("Encrypting Data...", {
-      id: toastId,
-      position: "top-center",
-    });
-    const newData = encryptData(data, accessToken);
-    await delay(500);
-    if(getValues("security") && !user?.vaultpassword){
-      toast.error("Please set vault password", {
+  const onSubmit = useCallback(
+    async (data: FormValues) => {
+      if (!accessToken) return;
+      const toastId = toast.loading("Adding...", { position: "top-center" });
+      await delay(500);
+      toast.success("Encrypting Data...", {
         id: toastId,
         position: "top-center",
       });
-      return;
-    }
-    try {
-      const response = await fetch("/api/vault/logins/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ data: newData }),
-      });
-      if (response.ok) {
-        const res = await response.json();
-        reset();
-        router.push(res.data.slug);
-        toast.success("Added SuccessFull", {
+      const newData = encryptData(data, accessToken);
+      await delay(500);
+      if (getValues("security") && !user?.vaultpassword) {
+        toast.error("Please set vault password", {
           id: toastId,
           position: "top-center",
         });
-      } else {
-        toast.error("Something went wrong", {
-          id: toastId,
-          position: "top-center",
-        });
+        return;
       }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  }, [user]);
+      try {
+        const response = await fetch("/api/vault/logins/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ data: newData }),
+        });
+        if (response.ok) {
+          const res = await response.json();
+          reset();
+          router.push(res.data.slug);
+          toast.success("Added SuccessFull", {
+            id: toastId,
+            position: "top-center",
+          });
+        } else {
+          toast.error("Something went wrong", {
+            id: toastId,
+            position: "top-center",
+          });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    },
+    [user]
+  );
 
   const generatePassword = () => {
     setGeneratePassword(true);
@@ -183,7 +195,11 @@ const LoginForm = () => {
     }, 1000);
   };
 
-  const { data: encryptedData, isLoading, refetch: profilerefetch } = useGetLoggedUserQuery(
+  const {
+    data: encryptedData,
+    isLoading,
+    refetch: profilerefetch,
+  } = useGetLoggedUserQuery(
     { token: accessToken },
     { skip: !accessToken || !getValues("security") }
   );
@@ -195,7 +211,7 @@ const LoginForm = () => {
       setUser(data);
     }
   }, [data, loading]);
-  
+
   const onSubmitVaultPassword = useCallback(async () => {
     if (!accessToken) return;
     const toastId = toast.loading("Adding...", { position: "top-center" });
@@ -220,12 +236,14 @@ const LoginForm = () => {
     }
   }, []);
 
-
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex gap-3 w-full items-center flex-col lg:flex-row "
+        className={cn(
+          "flex gap-3 w-full items-center flex-col lg:flex-row",
+          className
+        )}
       >
         <div className="p-3 space-y-2 w-full">
           <div className="space-y-2">
@@ -374,11 +392,14 @@ const LoginForm = () => {
               )}
             />
           </div>
-          <Button variant="secondary" className="absolute right-0 top-0">
+          <Button
+            variant="secondary"
+            className={cn("absolute right-0 top-0", submitButton)}
+          >
             save
           </Button>
         </div>
-        <div className="w-full h-full lg:mt-14">
+        <div className={cn("w-full h-full lg:mt-14", security)}>
           <div className="relative flex w-full items-start gap-2 rounded-lg p-4 has-[[data-state=checked]]:border-ring">
             <FormField
               control={form.control}
@@ -403,26 +424,38 @@ const LoginForm = () => {
               </p>
             </div>
           </div>
-          {user && !user?.vaultpassword && getValues("security") && <Form {...vaultPasswordForm}>
-            <div className="flex gap-3 w-full items-center flex-col lg:flex-row p-4">
-              <div className="space-y-2 relative w-full">
-                <FormField
-                  control={vaultPasswordForm.control}
-                  name="vaultpassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Vault Password</FormLabel>
-                      <FormControl>
-                        <Input placeholder="vault Password" type="password" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="button" onClick={()=>onSubmitVaultPassword()} className="absolute right-0">Set vault Password</Button>
+          {user && !user?.vaultpassword && getValues("security") && (
+            <Form {...vaultPasswordForm}>
+              <div className="flex gap-3 w-full items-center flex-col lg:flex-row p-4">
+                <div className="space-y-2 relative w-full">
+                  <FormField
+                    control={vaultPasswordForm.control}
+                    name="vaultpassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vault Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="vault Password"
+                            type="password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => onSubmitVaultPassword()}
+                    className="absolute right-0"
+                  >
+                    Set vault Password
+                  </Button>
+                </div>
               </div>
-            </div>
-          </Form>}
+            </Form>
+          )}
         </div>
       </form>
     </Form>

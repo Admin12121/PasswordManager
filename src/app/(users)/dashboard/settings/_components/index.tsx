@@ -14,6 +14,7 @@ import ChangeVaultpassword from "./vaultpassword";
 import Authenticationverify from "./authentication_verify";
 import { UserData } from "@/schemas";
 import FeedBack from "./sendfeedback";
+import Image from "next/image";
 
 const MainSettings = () => {
   const { accessToken } = useAuthUser();
@@ -36,7 +37,7 @@ const MainSettings = () => {
   }, [data]);
 
   return (
-    <div className="flex items-start gap-5 flex-wrap">
+    <section id="optimized-scheduling" className="">
       {user && isDialogOpen && (
         <Authenticationverify
           user={user}
@@ -44,71 +45,116 @@ const MainSettings = () => {
           setIsOpen={setIsDialogOpen}
         />
       )}
-      <Profile user={user} />
-      <div className="group w-full overflow-hidden max-w-md p-6 rounded-2xl dark:bg-[#1212128a] shadow-xl relative before:border-t-1 before:border-[#fff]">
-        <div className="absolute top-0 left-1/2 w-4/5 h-[1px] rounded-full bg-gradient-to-r from-transparent via-[#ffffff95] dark:via-[#ffffff95] to-transparent transform -translate-x-1/2 transition-opacity duration-300 opacity-0 group-hover:opacity-100" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_center,_rgba(255,255,255,0.1),_transparent_60%)] transition-opacity duration-300 opacity-0 group-hover:opacity-100" />
-        <div className="flex gap-5">
-          <Security />
-          <span className="flex flex-col">
-            <h1 className="text-2xl">Password </h1>
-            <h1 className="text-lg">& Security</h1>
-          </span>
-        </div>
-
-        <div className="rounded-lg overflow-hidden mt-5 shadow-sm">
-          <div className="divide-y">
-            <Changepassword user={user} accessToken={accessToken} />
-            <Two_factor_auth user={user} accessToken={accessToken} />
-            <ChangeVaultpassword user={user} accessToken={accessToken} />
-          </div>
-        </div>
-        <Login_alerts />
+      <div className="flex h-8 gap-1 max-lg:hidden">
+        <div className="flex-1 border" />
+        <div
+          className="h-full border-2 border-dashed w-52"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='7' height='7' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23888888' fill-opacity='0.15' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E")`,
+          }}
+        ></div>
+        <div className="w-24 border" />
+        <div
+          className="h-full border-2 border-dashed w-52"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='7' height='7' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23888888' fill-opacity='0.15' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E")`,
+          }}
+        ></div>
+        <div className="w-24 border" />
+        <div
+          className="h-full border-2 border-dashed w-52"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='7' height='7' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23888888' fill-opacity='0.15' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E")`,
+          }}
+        ></div>
+        <div className="flex-1 border" />
       </div>
-      <div className="group w-full overflow-hidden max-w-md p-6 rounded-2xl dark:bg-[#1212128a] shadow-xl relative before:border-t-1 before:border-[#fff]">
-        <div className="absolute top-0 left-1/2 w-4/5 h-[1px] rounded-full bg-gradient-to-r from-transparent via-[#ffffff95] dark:via-[#ffffff95] to-transparent transform -translate-x-1/2 transition-opacity duration-300 opacity-0 group-hover:opacity-100" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_center,_rgba(255,255,255,0.1),_transparent_60%)] transition-opacity duration-300 opacity-0 group-hover:opacity-100" />
-        <div className="flex gap-5 items-center">
-          <CircleHelp className="w-[65px] h-[65px] stroke-[#2d3136]" />
-          <span className="flex flex-col">
-            <h1 className="text-2xl">More info </h1>
-            <h1 className="text-lg">& support</h1>
-          </span>
-        </div>
-
-        <div className="rounded-lg overflow-hidden mt-5 shadow-sm">
-          <div className="divide-y">
-            <Button
-              className="group h-auto gap-4 py-3 text-left w-full border-none rounded-none justify-between"
-              variant="outline"
-            >
-              <div className="space-y-1">
-                <h3>Help Center</h3>
-              </div>
-              <ChevronRightIcon
-                className="opacity-60 transition-transform group-hover:translate-x-0.5"
-                size={16}
-                aria-hidden="true"
-              />
-            </Button>
-            <Button
-              className="group h-auto gap-4 py-3 text-left w-full  border-none rounded-none justify-between"
-              variant="outline"
-            >
-              <div className="space-y-1">
-                <h3>Privacy and security help</h3>
-              </div>
-              <ChevronRightIcon
-                className="opacity-60 transition-transform group-hover:translate-x-0.5"
-                size={16}
-                aria-hidden="true"
-              />
-            </Button>
-            <FeedBack />
-          </div>
+      <div className="border-b">
+        <div className="container flex flex-col gap-6 border-x py-4 max-lg:border-x lg:py-8">
+          <h2 className="text-3xl leading-tight tracking-tight md:text-4xl lg:text-6xl">
+            Password Manager
+          </h2>
         </div>
       </div>
-    </div>
+      <div className="container border-x lg:!px-0 border-b-1 lg:border-b-0">
+        <div dir="ltr" data-orientation="horizontal" className="">
+          <div
+            role="tablist"
+            aria-orientation="horizontal"
+            className="text-muted-foreground inline-flex items-center justify-center rounded-lg h-auto w-full bg-transparent p-0 max-lg:flex-col max-lg:divide-y lg:grid lg:grid-cols-3 lg:divide-x"
+            tabIndex={0}
+            data-orientation="horizontal"
+            style={{ outline: "none" }}
+          >
+            <span className="ring-offset-background focus-visible:ring-ring data-[state=active]:bg-background data-[state=active]:text-foreground items-center justify-center text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 group relative isolate inline-block h-full w-full rounded-none px-1 py-5 text-start whitespace-normal data-[state=active]:shadow-none max-lg:border-x last:max-lg:!border-b lg:border-b lg:px-8">
+              <Profile user={user} />
+            </span>
+            <span className="flex flex-col items-start justify-start ring-offset-background focus-visible:ring-ring data-[state=active]:bg-background data-[state=active]:text-foreground text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 group relative isolate h-full w-full rounded-none px-1 py-5 text-start whitespace-normal data-[state=active]:shadow-none max-lg:border-x last:max-lg:!border-b lg:border-b lg:px-8">
+              <div className="flex gap-5">
+                <Security />
+                <span className="flex flex-col">
+                  <h1 className="text-2xl">Password </h1>
+                  <h1 className="text-lg">& Security</h1>
+                </span>
+              </div>
+
+              <div className="rounded-lg w-full overflow-hidden mt-5 shadow-sm">
+                <div className="divide-y">
+                  <Changepassword user={user} accessToken={accessToken} />
+                  <Two_factor_auth user={user} accessToken={accessToken} />
+                  <ChangeVaultpassword user={user} accessToken={accessToken} />
+                </div>
+              </div>
+              <Login_alerts />
+            </span>
+            <span className="flex flex-col items-start justify-start ring-offset-background focus-visible:ring-ring data-[state=active]:text-foreground text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 group relative isolate h-full w-full rounded-none px-1 py-5 text-start whitespace-normal data-[state=active]:shadow-none max-lg:border-x last:max-lg:!border-b lg:border-b lg:px-8">
+              <div className="flex gap-5 items-center">
+                <CircleHelp className="w-[65px] h-[65px] stroke-[#2d3136]" />
+                <span className="flex flex-col">
+                  <h1 className="text-2xl">More info </h1>
+                  <h1 className="text-lg">& support</h1>
+                </span>
+              </div>
+
+              <div className="rounded-lg w-full overflow-hidden mt-5 shadow-sm">
+                <div className="divide-y">
+                  <Button
+                    className="group h-auto gap-4 py-3 text-left w-full border-none rounded-none justify-between"
+                    variant="outline"
+                  >
+                    <div className="space-y-1">
+                      <h3>Help Center</h3>
+                    </div>
+                    <ChevronRightIcon
+                      className="opacity-60 transition-transform group-hover:translate-x-0.5"
+                      size={16}
+                      aria-hidden="true"
+                    />
+                  </Button>
+                  <Button
+                    className="group h-auto gap-4 py-3 text-left w-full  border-none rounded-none justify-between"
+                    variant="outline"
+                  >
+                    <div className="space-y-1">
+                      <h3>Privacy and security help</h3>
+                    </div>
+                    <ChevronRightIcon
+                      className="opacity-60 transition-transform group-hover:translate-x-0.5"
+                      size={16}
+                      aria-hidden="true"
+                    />
+                  </Button>
+                  <FeedBack />
+                </div>
+              </div>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className="h-8 w-full border-b md:h-12 lg:h-[112px]">
+        <div className="container h-full w-full border-x" />
+      </div>
+    </section>
   );
 };
 

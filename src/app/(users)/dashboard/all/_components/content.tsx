@@ -17,8 +17,10 @@ import {
   KeyRound,
   Files,
   MailIcon,
-  Key,
   Globe,
+  EllipsisVertical,
+  Pin,
+  Trash,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,6 +46,12 @@ import Spinner from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { encryptData } from "@/hooks/dec-data";
 import { useAuthUser } from "@/hooks/use-auth-user";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const formSchema = z.object({
   slug: z.string(),
@@ -99,10 +107,12 @@ const ContentData = ({ slug }: ViewLoginProps) => {
   const [update, setUpdate] = useState<boolean>(false);
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [preVisible, setpreVisible] = useState<boolean>(false);
   const [generatingpasswordLoader, setGeneratePassword] =
     useState<boolean>(false);
 
   const toggleVisibility = () => setIsVisible((prevState) => !prevState);
+  const togglePreVisibility = () => setpreVisible((prevState) => !prevState);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -175,37 +185,63 @@ const ContentData = ({ slug }: ViewLoginProps) => {
 
   return (
     <Form {...form}>
-      {!update && <div className="flex flex-col mt-2 px-2">
-        <h1 className="text-2xl">{data?.title}</h1>
-        <div className="mt-3 w-full h-32 rounded-xl border overflow-hidden">
-          <div onClick={()=>{copyToClipboard(data.username)}} className="cursor-pointer h-16 border-b-1 dark:bg-neutral-800/30 dark:hover:bg-neutral-950/50 flex items-center px-3 gap-3">
-            <MailIcon className="opacity-60 w-5 h-5" />
-            <div className="flex flex-col">
-              <p className="text-xs dark:text-neutral-400">Email</p>
-              <p className="text-sm">{data?.username}</p>
+      {!update && (
+        <div className="flex flex-col mt-2 px-2">
+          <h1 className="text-2xl">{data?.title}</h1>
+          <div className="mt-3 w-full h-32 rounded-xl border overflow-hidden">
+            <div
+              onClick={() => {
+                copyToClipboard(data.username);
+              }}
+              className="cursor-pointer h-16 border-b-1 dark:bg-neutral-800/30 dark:hover:bg-neutral-950/50 hover:bg-neutral-200/50 flex items-center px-3 gap-3"
+            >
+              <MailIcon className="opacity-60 w-5 h-5" />
+              <div className="flex flex-col">
+                <p className="text-xs dark:text-neutral-400">Email</p>
+                <p className="text-sm">{data?.username}</p>
+              </div>
+            </div>
+            <div
+              onClick={() => {
+                copyToClipboard(data.password);
+              }}
+              className="cursor-pointer h-16 border-b-1 dark:bg-neutral-800/30 dark:hover:bg-neutral-950/50 hover:bg-neutral-200/50 flex items-center px-3 gap-3"
+            >
+              <KeyRound className="opacity-60 w-5 h-5" />
+              <div className="relative flex flex-col w-full">
+                <p className="text-xs dark:text-neutral-400">Password</p>
+                <p>{preVisible ? data.password : "*****************"}</p>
+                <button
+                  className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                  type="button"
+                  onClick={togglePreVisibility}
+                  aria-label={preVisible ? "Hide password" : "Show password"}
+                  aria-pressed={preVisible}
+                  aria-controls="password"
+                >
+                  {preVisible ? (
+                    <EyeOff size={16} strokeWidth={2} aria-hidden="true" />
+                  ) : (
+                    <Eye size={16} strokeWidth={2} aria-hidden="true" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
-          <div onClick={()=>{copyToClipboard(data.password)}} className="cursor-pointer h-16 border-b-1 bg-neutral-800/30 dark:hover:bg-neutral-950/50 flex items-center px-3 gap-3">
-            <KeyRound className="opacity-60 w-5 h-5" />
+          <div className="mt-2 w-full h-16 rounded-xl border overflow-hidden cursor-pointer border-b-1 dark:bg-neutral-800/30 dark:hover:bg-neutral-950/50 hover:bg-neutral-200/50 flex items-center px-3 gap-3">
+            <Globe className="opacity-60 w-5 h-5" />
             <div className="flex flex-col">
-              <p className="text-xs dark:text-neutral-400">Password</p>
-              <p>*****************</p>
+              <p className="text-xs dark:text-neutral-400">Websites</p>
+              <p className="text-sm hover:underline">{data?.website}</p>
             </div>
           </div>
-        </div>
-        <div className="mt-2 w-full h-16 rounded-xl border overflow-hidden cursor-pointer border-b-1 bg-neutral-800/30 dark:hover:bg-neutral-950/50 flex items-center px-3 gap-3">
-          <Globe className="opacity-60 w-5 h-5" />
-          <div className="flex flex-col">
-            <p className="text-xs dark:text-neutral-400">Websites</p>
-            <p className="text-sm">{data?.website}</p>
+          <div className="mt-2 w-full h-48 rounded-xl border overflow-hidden">
+            <div className="cursor-pointer h-16 border-b-1 dark:bg-neutral-800/30 dark:hover:bg-neutral-950/50 hover:bg-neutral-200/50 flex items-center px-3 gap-3"></div>
+            <div className="cursor-pointer h-16 border-b-1 dark:bg-neutral-800/30 dark:hover:bg-neutral-950/50 hover:bg-neutral-200/50 flex items-center px-3 gap-3"></div>
+            <div className="cursor-pointer h-16 border-b-1 dark:bg-neutral-800/30 dark:hover:bg-neutral-950/50 hover:bg-neutral-200/50 flex items-center px-3 gap-3"></div>
           </div>
         </div>
-        <div className="mt-2 w-full h-48 rounded-xl border overflow-hidden">
-          <div className="cursor-pointer h-16 border-b-1 bg-neutral-800/30 dark:hover:bg-neutral-950/50 flex items-center px-3 gap-3"></div>
-          <div className="cursor-pointer h-16 border-b-1 bg-neutral-800/30 dark:hover:bg-neutral-950/50 flex items-center px-3 gap-3"></div>
-          <div className="cursor-pointer h-16 border-b-1 bg-neutral-800/30 dark:hover:bg-neutral-950/50 flex items-center px-3 gap-3"></div>
-        </div>
-      </div>}
+      )}
       {update && (
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -454,14 +490,42 @@ const ContentData = ({ slug }: ViewLoginProps) => {
         </form>
       )}
       {!update && (
-        <Button
-          type="button"
-          variant="secondary"
-          className="absolute right-0 top-2"
-          onClick={() => setUpdate(true)}
-        >
-          Edit
-        </Button>
+        <>
+          <Button
+            type="button"
+            variant="secondary"
+            className="absolute right-10 top-2"
+            onClick={() => setUpdate(true)}
+          >
+            Edit
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size={"icon"}
+                type="button"
+                variant="secondary"
+                className="absolute right-0 top-2"
+              >
+                <EllipsisVertical />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>
+                <Pin className="w-4 h-4 rotate-45" />
+                Pin item
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Trash className="w-4 h-4" />
+                Move to Trash
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <EyeOff className="w-4 h-4" />
+                Exclude from monitoring
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </>
       )}
     </Form>
   );

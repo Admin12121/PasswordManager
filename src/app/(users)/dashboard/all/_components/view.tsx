@@ -22,6 +22,7 @@ import ContentData from "./content";
 import LogoAnimation, {
   AnimatedNumber,
 } from "@/components/global/logo_animation";
+import { useAuthUser } from "@/hooks/use-auth-user";
 
 interface SiteProps {
   avatarProps: {
@@ -74,11 +75,17 @@ interface VaultData {
 }
 
 const View = ({ logins }: { logins: VaultData[] }) => {
+  const { accessToken } = useAuthUser();
   const [slug, setSlug] = useState(logins.length > 0 ? logins[0].slug : "");
+  const [sec, setSec] = useState<boolean>(
+    logins.length > 0 ? logins[0].security : false
+  );
   const [progress, setProgress] = useState(0);
+  const [verified, setVerified] = useState(false);
 
   useEffect(() => {
-    if (!slug) return;
+    if (sec || !slug) return;
+    setProgress(0);
     let start = 0;
     const interval = setInterval(() => {
       const increment = start < 70 ? 5 : 1;
@@ -90,7 +97,20 @@ const View = ({ logins }: { logins: VaultData[] }) => {
         setProgress(start);
       }
     }, 30);
-  }, [slug]);
+    return () => clearInterval(interval);
+  }, [slug, sec]);
+
+  const handleVerification = ({ slug }: { slug: string }) => {
+    setVerified(true);
+    setSec(false);
+  };
+
+  const ToggleData = ({ slug, sec }: { slug: string; sec: boolean }) => {
+    setSec(sec);
+    setSlug(slug);
+    setVerified(false);
+    setProgress(0);
+  };
 
   return (
     <div className="relative w-full h-dvh flex">
@@ -163,10 +183,13 @@ const View = ({ logins }: { logins: VaultData[] }) => {
           {logins.map((data) => (
             <div
               onClick={() => {
-                setSlug(data.slug);
+                ToggleData({ slug: data.slug, sec: data.security });
               }}
               key={Math.random()}
-              className={cn("flex h-14 w-full  p-2 gap-5 cursor-pointer", slug == data.slug && "dark:bg-neutral-800/50")}
+              className={cn(
+                "flex h-14 w-full  p-2 gap-5 cursor-pointer",
+                slug == data.slug && "dark:bg-neutral-800/50 bg-neutral-200/50"
+              )}
             >
               <Website
                 avatarProps={{
@@ -195,12 +218,17 @@ const View = ({ logins }: { logins: VaultData[] }) => {
         </div>
       </div>
       <div className="relative w-[50%] h-full py-1">
-        {progress < 100 ? (
+        {sec && !verified ? (
+          <VerifyVaultSecurity
+            token={accessToken!}
+            slug={slug}
+            onSuccess={handleVerification}
+          />
+        ) : progress < 100 ? (
           <LogoAnimation className="h-full font-normal flex items-center justify-center !text-sm">
-            Sync Data
+            Sync Data{" "}
             <AnimatedNumber
               className="w-14 flex justify-end"
-              springOptions={{ bounce: 0, duration: 1000 }}
               value={progress}
             />
             %
@@ -214,3 +242,119 @@ const View = ({ logins }: { logins: VaultData[] }) => {
 };
 
 export default View;
+
+import { motion } from "framer-motion";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { z } from "zod";
+import { toast } from "sonner";
+import { delay } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+
+const TotpSchema = z.object({
+  token: z
+    .string()
+    .min(6, { message: "Code must be at least 6 characters long" })
+    .max(6, { message: "Max character accept 6" }),
+});
+type Totpd = z.infer<typeof TotpSchema>;
+const defaultVaultPasswordValues: Totpd = {
+  token: "",
+};
+
+const VerifyVaultSecurity = ({
+  token,
+  slug,
+  onSuccess,
+}: {
+  token: string;
+  slug: string;
+  onSuccess: any;
+}) => {
+  const form = useForm<Totpd>({
+    resolver: zodResolver(TotpSchema),
+    mode: "onChange",
+    defaultValues: defaultVaultPasswordValues,
+  });
+
+  const onSubmit = async (data: Totpd) => {
+    const toastId = toast.loading("Verifying...", { position: "top-center" });
+    await delay(500);
+    try {
+      const response = await fetch("/api/authenticator/verify/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ data }),
+      });
+      if (response.ok) {
+        const res = await response.json();
+        onSuccess(slug);
+        toast.success("Verified successfull", {
+          id: toastId,
+          position: "top-center",
+        });
+      } else {
+        toast.error("Something went wrong", {
+          id: toastId,
+          position: "top-center",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  return (
+    <motion.div
+      key="verify-step"
+      initial={{ opacity: 0, x: 50 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -50 }}
+      transition={{ duration: 0.5 }}
+      className={cn("flex items-center justify-center h-full")}
+    >
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-5 flex flex-col items-start justify-center"
+        >
+          <div className="space-y-0">
+            {/* <p className="text-sm">{user?.username}.password_manager</p> */}
+            <h1 className="text-2xl m-0">
+              Get your code from your authentication app
+            </h1>
+            <p>Enter the 6-digit code generated by your authentication app.</p>
+          </div>
+          <FormField
+            control={form.control}
+            name="token"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormControl>
+                  <Input
+                    className="bg-muted h-10 w-full"
+                    placeholder="Enter code"
+                    required
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button className="w-full dark:hover:text-white">Next</Button>
+        </form>
+      </Form>
+    </motion.div>
+  );
+};

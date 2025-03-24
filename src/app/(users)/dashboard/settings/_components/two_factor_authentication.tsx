@@ -286,7 +286,7 @@ const Two_factor_auth = ({
                   <h1>1. Download as authentication app</h1>
                   <p className="text-sm dark:text-neutral-300">
                     We recommend downloading Duo Mobile or Google Authenticator
-                    if you don't have one installed.
+                    if you don&#39;t have one installed.
                   </p>
                 </span>
 
@@ -421,8 +421,8 @@ const Two_factor_auth = ({
                   Two-factor authentication is on
                 </DialogTitle>
                 <DialogDescription>
-                  We'll now ask for a login code anytime you log in on a device
-                  we don't recognize. To change your contact info, go to the
+                  We&#39;ll now ask for a login code anytime you log in on a device
+                  we don&#39;t recognize. To change your contact info, go to the
                   Personal derails section in Settings.
                 </DialogDescription>
               </DialogHeader>
@@ -445,15 +445,12 @@ const Two_factor_auth = ({
                   Authentication App added.
                 </DialogTitle>
                 <DialogDescription>
-                  We'll now ask for a login code anytime you log in on a device
-                  we don't recognize. To change your contact info, go to the
+                  We&#39;ll now ask for a login code anytime you log in on a device
+                  we don&#39;t recognize. To change your contact info, go to the
                   Personal derails section in Settings.
                 </DialogDescription>
               </DialogHeader>
               <Button
-                onClick={() => {
-                  // setIsOpen(false);
-                }}
                 className="w-full dark:hover:text-white"
               >
                 Done

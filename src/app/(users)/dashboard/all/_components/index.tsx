@@ -10,15 +10,26 @@ import { LoaderCircle } from "lucide-react";
 import { useDecryptedData } from "@/hooks/dec-data";
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import Empty from "./empty";
+import LoginForm from "../../logins/add-login/_components";
 
 const View = dynamic(() => import("./view"), { ssr: false });
 
 interface VaultData {
-    security: boolean;
-    slug: string;
-    title: string;
-    username: string;
+  security: boolean;
+  slug: string;
+  title: string;
+  username: string;
 }
 
 const ViewAll = () => {
@@ -91,14 +102,27 @@ const ViewAll = () => {
             )}
           </div>
         </div>
-        <div className="flex gap-3">
-          <Button
-            variant="secondary"
-            className="flex h-8 gap-2 p-0 px-2 data-[state=open]:bg-muted"
-            //   onClick={() => router.push(addlink)}
-          >
-            <Plus className="w-4 h-4" /> Create item
-          </Button>
+        <div className="flex gap-3 pr-3">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="secondary"
+                className="flex h-8 gap-2 p-0 px-2 data-[state=open]:bg-muted"
+              >
+                <Plus className="w-4 h-4" /> Create item
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="lg:w-[700px] !max-w-[700px] p-0">
+              <SheetHeader>
+                <SheetTitle></SheetTitle>
+              </SheetHeader>
+              <LoginForm
+                className="!flex-col"
+                submitButton="top-auto bottom-2 w-[98%] left-[50%] transform -translate-x-[50%]"
+                security="!mt-0"
+              />
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
       {data && data.count == 0 && <Empty />}

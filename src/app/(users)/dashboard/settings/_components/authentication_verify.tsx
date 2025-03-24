@@ -270,8 +270,8 @@ const Authenticationverify = ({
                   Authentication App added.
                 </DialogTitle>
                 <DialogDescription>
-                  We'll now ask for a login code anytime you log in on a device
-                  we don't recognize. To change your contact info, go to the
+                  We&apos;ll now ask for a login code anytime you log in on a device
+                  we don&apos;t recognize. To change your contact info, go to the
                   Personal derails section in Settings.
                 </DialogDescription>
               </DialogHeader>

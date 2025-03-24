@@ -21,7 +21,7 @@ const Empty = () => {
       <div className="container mx-auto pt-16 h-[95.8dvh] pb-12 text-center md:pt-20 lg:pt-28 justify-center flex flex-col">
         <h1 className="mx-auto">Your vault is empty</h1>
         <p className="text-muted-foreground mx-auto max-w-[500px] leading-[1.5] tracking-[-0.32px]">
-          Let's get you started by creating your first item
+          Let&apos;s get you started by creating your first item
         </p>
         <div className="flex flex-col space-y-2 items-center justify-center mt-6">
           <Button className="min-w-[300px]">

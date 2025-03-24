@@ -94,11 +94,6 @@ export const Links: links[] = [
     href: "/dashboard/wallet",
   },
   {
-    title: "Address",
-    icon: MapPin,
-    href: "/dashboard/address",
-  },
-  {
     title: "Notes",
     icon: NotepadText,
     href: "/dashboard/notes",
@@ -107,7 +102,7 @@ export const Links: links[] = [
     separator: true,
     title: "Trash",
     icon: Trash,
-    href: "/dashboard/settings",
+    href: "/dashboard/trash",
   },
   {
     title: "Password Generator",

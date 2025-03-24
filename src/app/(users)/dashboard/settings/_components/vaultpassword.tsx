@@ -85,7 +85,7 @@ const ChangeVaultpassword = ({
     setGeneratingPasswordLoader(true);
     const chars =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+[]{}|;:,.<>?";
-    let newPassword = Array.from(
+    const newPassword = Array.from(
       { length: 40 },
       () => chars[Math.floor(Math.random() * chars.length)]
     ).join("");

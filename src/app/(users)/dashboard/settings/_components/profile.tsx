@@ -7,9 +7,7 @@ import { UserData } from "@/schemas";
 
 const Profile = ({ user }: { user?: UserData }) => {
   return (
-    <div className="group w-full overflow-hidden max-w-md p-6 rounded-2xl dark:bg-[#1212128a] shadow-xl relative before:border-t-1 before:border-[#fff]">
-      <div className="absolute top-0 left-1/2 w-4/5 h-[1px] rounded-full bg-gradient-to-r from-transparent via-[#ffffff95] dark:via-[#ffffff95] to-transparent transform -translate-x-1/2 transition-opacity duration-300 opacity-0 group-hover:opacity-100" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_center,_rgba(255,255,255,0.1),_transparent_60%)] transition-opacity duration-300 opacity-0 group-hover:opacity-100" />
+    <>
       <div className="flex mb-6 items-center gap-5">
         <div className="relative">
           <Avatar className="h-16 w-16 rounded-lg">
@@ -95,7 +93,7 @@ const Profile = ({ user }: { user?: UserData }) => {
           Logout
         </Button>
       </div>
-    </div>
+    </>
   );
 };
 

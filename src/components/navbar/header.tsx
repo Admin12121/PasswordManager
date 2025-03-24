@@ -6,7 +6,6 @@ import Nav from "./nav";
 const SiteBanner = dynamic(() => import('../site-banner'), { ssr: false })
 
 export function SiteHeader({ children }: { children?: React.ReactNode }) {
-  // const { status } = useAuthUser();
 
   return (
     <>

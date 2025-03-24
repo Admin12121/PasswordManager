@@ -374,7 +374,7 @@ const ViewLogin = ({ slug }: ViewLoginProps) => {
           )}
         </div>
         <div className="w-full h-full">
-          <div className="relative flex w-full items-start gap-2 rounded-lg p-4 has-[[data-state=checked]]:border-ring">
+          <div className="relative flex w-full items-start gap-2 rounded-lg p-4 has-[[data-state=checked]]:border-ring mt-8">
             <FormField
               control={form.control}
               name="security"
