@@ -14,7 +14,6 @@ import ChangeVaultpassword from "./vaultpassword";
 import Authenticationverify from "./authentication_verify";
 import { UserData } from "@/schemas";
 import FeedBack from "./sendfeedback";
-import Image from "next/image";
 
 const MainSettings = () => {
   const { accessToken } = useAuthUser();
@@ -38,10 +37,10 @@ const MainSettings = () => {
 
   return (
     <section id="optimized-scheduling" className="">
-      {user && isDialogOpen && (
+      {user && (
         <Authenticationverify
           user={user}
-          isOpen={isDialogOpen}
+          isOpen={!!user && isDialogOpen}
           setIsOpen={setIsDialogOpen}
         />
       )}

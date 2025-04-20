@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -72,6 +72,7 @@ const Authenticationverify = ({
   const { accessToken } = useAuthUser();
   const [data, setData] = useState({ qrCode: null, secret: null });
   const [step, setStep] = useState(1);
+  const hasFetched = useRef(false);
 
   const form = useForm<Totpd>({
     resolver: zodResolver(TotpSchema),
@@ -114,6 +115,9 @@ const Authenticationverify = ({
   };
 
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+  
     const fetchData = async () => {
       try {
         await delay(500);

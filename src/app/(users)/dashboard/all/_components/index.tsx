@@ -6,22 +6,32 @@ import { useAuthUser } from "@/hooks/use-auth-user";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "nextjs-toploader/app";
 import dynamic from "next/dynamic";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, NotepadText, UserRound, Wallet } from "lucide-react";
 import { useDecryptedData } from "@/hooks/dec-data";
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
-  SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Empty from "./empty";
 import LoginForm from "../../logins/add-login/_components";
+import {
+  BoltIcon,
+  ChevronDownIcon,
+  CopyPlusIcon,
+  FilesIcon,
+  Layers2Icon,
+} from "lucide-react";
 
 const View = dynamic(() => import("./view"), { ssr: false });
 
@@ -103,7 +113,39 @@ const ViewAll = () => {
           </div>
         </div>
         <div className="flex gap-3 pr-3">
-          <Sheet>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="flex h-8 gap-2 p-0 px-2 data-[state=open]:bg-muted"
+              >
+                <Plus className="w-4 h-4" /> Create item
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>
+                <UserRound
+                  size={16}
+                  className="opacity-60"
+                  aria-hidden="true"
+                />
+                Login
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <NotepadText
+                  size={16}
+                  className="opacity-60"
+                  aria-hidden="true"
+                />
+                Notes
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Wallet size={16} className="opacity-60" aria-hidden="true" />
+                Wallet
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {/* <Sheet>
             <SheetTrigger asChild>
               <Button
                 variant="secondary"
@@ -122,7 +164,7 @@ const ViewAll = () => {
                 security="!mt-0"
               />
             </SheetContent>
-          </Sheet>
+          </Sheet> */}
         </div>
       </div>
       {data && data.count == 0 && <Empty />}
