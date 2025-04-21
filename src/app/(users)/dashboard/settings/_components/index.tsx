@@ -11,7 +11,6 @@ import Changepassword from "./change_password";
 import Two_factor_auth from "./two_factor_authentication";
 import Login_alerts from "./login_alerts";
 import ChangeVaultpassword from "./vaultpassword";
-import Authenticationverify from "./authentication_verify";
 import { UserData } from "@/schemas";
 import FeedBack from "./sendfeedback";
 
@@ -20,30 +19,17 @@ const MainSettings = () => {
   const [user, setUser] = useState<UserData>();
   const { data: encryptedData, isLoading } = useGetLoggedUserQuery(
     { token: accessToken },
-    { skip: !accessToken }
+    { skip: !accessToken },
   );
-
   const { data, loading } = useDecryptedData(encryptedData, isLoading);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   useEffect(() => {
     if (data) {
       setUser(data);
-      if (!data.totp_secret) {
-        setIsDialogOpen(true);
-      }
     }
   }, [data]);
 
   return (
     <section id="optimized-scheduling" className="">
-      {user && (
-        <Authenticationverify
-          user={user}
-          isOpen={!!user && isDialogOpen}
-          setIsOpen={setIsDialogOpen}
-        />
-      )}
       <div className="flex h-8 gap-1 max-lg:hidden">
         <div className="flex-1 border" />
         <div

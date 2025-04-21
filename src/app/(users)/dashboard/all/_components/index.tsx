@@ -4,19 +4,11 @@ import { useState, useEffect, useCallback } from "react";
 import { useGetVaultQuery } from "@/lib/store/api/api";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "nextjs-toploader/app";
 import dynamic from "next/dynamic";
 import { LoaderCircle, NotepadText, UserRound, Wallet } from "lucide-react";
 import { useDecryptedData } from "@/hooks/dec-data";
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,15 +16,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Empty from "./empty";
-import LoginForm from "../../logins/add-login/_components";
-import {
-  BoltIcon,
-  ChevronDownIcon,
-  CopyPlusIcon,
-  FilesIcon,
-  Layers2Icon,
-} from "lucide-react";
-
 const View = dynamic(() => import("./view"), { ssr: false });
 
 interface VaultData {
@@ -40,24 +23,23 @@ interface VaultData {
   slug: string;
   title: string;
   username: string;
+  authtoken: boolean;
 }
 
 const ViewAll = () => {
-  const router = useRouter();
-  const { accessToken } = useAuthUser();
+  const { accessToken, user } = useAuthUser();
   const [search, setSearch] = useState<string>("");
   const [rowsperpage, setRowsPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
   const [exclude_by, SetExcludeBy] = useState<string>("");
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
-
   const {
     data: encryptedData,
     isLoading,
     refetch,
   } = useGetVaultQuery(
     { search, page_size: rowsperpage, page, exclude_by, token: accessToken },
-    { skip: !accessToken }
+    { skip: !accessToken },
   );
   const { data } = useDecryptedData(encryptedData, isLoading);
   const [logins, setLogins] = useState<VaultData[]>([]);
@@ -70,6 +52,7 @@ const ViewAll = () => {
 
   useEffect(() => {
     if (data) {
+      console.log(data);
       setLogins(data.results);
     }
   }, [data, page, exclude_by]);
@@ -145,26 +128,6 @@ const ViewAll = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {/* <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="secondary"
-                className="flex h-8 gap-2 p-0 px-2 data-[state=open]:bg-muted"
-              >
-                <Plus className="w-4 h-4" /> Create item
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="lg:w-[700px] !max-w-[700px] p-0">
-              <SheetHeader>
-                <SheetTitle></SheetTitle>
-              </SheetHeader>
-              <LoginForm
-                className="!flex-col"
-                submitButton="top-auto bottom-2 w-[98%] left-[50%] transform -translate-x-[50%]"
-                security="!mt-0"
-              />
-            </SheetContent>
-          </Sheet> */}
         </div>
       </div>
       {data && data.count == 0 && <Empty />}

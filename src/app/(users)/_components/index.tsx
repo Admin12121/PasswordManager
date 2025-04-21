@@ -47,8 +47,8 @@ function xorEncryptDecrypt(data: string, key: string) {
   return Array.from(data)
     .map((char: string, index: number) =>
       String.fromCharCode(
-        char.charCodeAt(0) ^ key.charCodeAt(index % key.length)
-      )
+        char.charCodeAt(0) ^ key.charCodeAt(index % key.length),
+      ),
     )
     .join("");
 }
@@ -117,7 +117,7 @@ const Authenticationverify = ({
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
-  
+
     const fetchData = async () => {
       try {
         await delay(500);
@@ -274,9 +274,9 @@ const Authenticationverify = ({
                   Authentication App added.
                 </DialogTitle>
                 <DialogDescription>
-                  We&apos;ll now ask for a login code anytime you log in on a device
-                  we don&apos;t recognize. To change your contact info, go to the
-                  Personal derails section in Settings.
+                  We&apos;ll now ask for a login code anytime you log in on a
+                  device we don&apos;t recognize. To change your contact info,
+                  go to the Personal derails section in Settings.
                 </DialogDescription>
               </DialogHeader>
               <Button

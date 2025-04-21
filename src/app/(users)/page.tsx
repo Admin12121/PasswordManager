@@ -1,10 +1,40 @@
+"use client";
+import { useState, useEffect } from "react";
 import { SiteHeader } from "@/components/navbar/header";
+import { useAuthUser } from "@/hooks/use-auth-user";
+import { useGetLoggedUserQuery } from "@/lib/store/api/api";
+import { useDecryptedData } from "@/hooks/dec-data";
 import Image from "next/image";
 import Link from "next/link";
+import { UserData } from "@/schemas";
+import Authenticationverify from "./_components";
 
 export default function Home() {
+  const { accessToken } = useAuthUser();
+  const [user, setUser] = useState<UserData>();
+  const { data: encryptedData, isLoading } = useGetLoggedUserQuery(
+    { token: accessToken },
+    { skip: !accessToken },
+  );
+  const { data, loading } = useDecryptedData(encryptedData, isLoading);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  useEffect(() => {
+    if (data) {
+      setUser(data);
+      if (!data.totp_secret) {
+        setIsDialogOpen(true);
+      }
+    }
+  }, [data]);
   return (
     <>
+      {user && (
+        <Authenticationverify
+          user={user}
+          isOpen={!!user && isDialogOpen}
+          setIsOpen={setIsDialogOpen}
+        />
+      )}
       <SiteHeader />
       <section className="w-full pb-16 text-center lg:pb-0">
         <div className="flex">

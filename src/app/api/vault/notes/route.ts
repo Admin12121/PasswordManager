@@ -4,8 +4,8 @@ function xorEncryptDecrypt(data: string, key: string) {
   return Array.from(data)
     .map((char: string, index: number) =>
       String.fromCharCode(
-        char.charCodeAt(0) ^ key.charCodeAt(index % key.length)
-      )
+        char.charCodeAt(0) ^ key.charCodeAt(index % key.length),
+      ),
     )
     .join("");
 }
@@ -26,14 +26,14 @@ export async function POST(request: NextRequest) {
     if (!encryptedData || !authorizationHeader) {
       return NextResponse.json(
         { error: "Missing encrypted data or authorization header" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     const token = authorizationHeader.replace("Bearer ", "");
     const key = token.slice(0, 32);
     const decryptedData = decryptData(encryptedData, key);
     const response = await fetch(
-      `${process.env.BACKEND_URL}/api/sales/sales/`,
+      `${process.env.BACKEND_URL}/api/vault/notes/`,
       {
         method: "POST",
         headers: {
@@ -43,23 +43,24 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           ...decryptedData,
         }),
-      }
+      },
     );
     if (response.ok) {
+      const responseData = await response.json();
       return NextResponse.json(
-        { data: { mesage: "Login Data Saved" } },
-        { status: 200 }
+        { data: { mesage: "Login Data Saved", slug: responseData.slug } },
+        { status: 200 },
       );
     } else {
       return NextResponse.json(
         { error: "Failed to create Login" },
-        { status: response.status }
+        { status: response.status },
       );
     }
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -72,16 +73,16 @@ export async function PATCH(request: NextRequest) {
     if (!encryptedData || !authorizationHeader) {
       return NextResponse.json(
         { error: "Missing encrypted data or authorization header" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     const token = authorizationHeader.replace("Bearer ", "");
     const key = token.slice(0, 32);
     const decryptedData = decryptData(encryptedData, key);
     const response = await fetch(
-      `${process.env.BACKEND_URL}/api/sales/sales/`,
+      `${process.env.BACKEND_URL}/api/vault/notes/${decryptedData.slug}/`,
       {
-        method: "POST",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           authorization: authorizationHeader,
@@ -89,23 +90,23 @@ export async function PATCH(request: NextRequest) {
         body: JSON.stringify({
           ...decryptedData,
         }),
-      }
+      },
     );
     if (response.ok) {
       return NextResponse.json(
-        { data: { success: "Login data Updated" } },
-        { status: 201 }
+        { data: { success: "Logins Updated" } },
+        { status: 201 },
       );
     } else {
       return NextResponse.json(
         { error: "Logins Failed to Update" },
-        { status: response.status }
+        { status: response.status },
       );
     }
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

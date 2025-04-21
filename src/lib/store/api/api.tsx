@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const createHeaders = (
   token?: string,
-  contentType: string = "application/json"
+  contentType: string = "application/json",
 ) => {
   const headers: HeadersInit = { "Content-type": contentType };
   if (token) {
@@ -12,7 +12,7 @@ const createHeaders = (
 };
 
 const buildQueryParams = (
-  params: Record<string, string | number | string[] | undefined>
+  params: Record<string, string | number | string[] | undefined>,
 ) => {
   const queryParams = Object.entries(params)
     .filter(
@@ -21,7 +21,7 @@ const buildQueryParams = (
         value !== null &&
         value !== "" &&
         value !== 0 &&
-        !(Array.isArray(value) && value.length === 0)
+        !(Array.isArray(value) && value.length === 0),
     )
     .map(([key, value]) => `${key}=${value}`)
     .join("&");
@@ -131,16 +131,14 @@ export const userAuthapi = createApi({
       }),
     }),
     getLogins: builder.query({
-      query: ({ slug, search, page_size, page, exclude_by, token }) => (
-        {
+      query: ({ slug, search, page_size, page, exclude_by, token }) => ({
         url: `/api/vault/logins/${slug ? `${slug}/` : ""}${buildQueryParams({ search, page_size, page, exclude_by })}`,
         method: "GET",
         headers: createHeaders(token),
       }),
     }),
     getVault: builder.query({
-      query: ({ slug, search, page_size, page, exclude_by, token }) => (
-        {
+      query: ({ slug, search, page_size, page, exclude_by, token }) => ({
         url: `/api/vault/logins/vaultdata/${slug ? `${slug}/` : ""}${buildQueryParams({ search, page_size, page, exclude_by })}`,
         method: "GET",
         headers: createHeaders(token),
@@ -156,6 +154,27 @@ export const userAuthapi = createApi({
     deleteLogins: builder.mutation({
       query: ({ slug, token }) => ({
         url: `/api/vault/logins/${slug ? `${slug}/` : ""}`,
+        method: "DELETE",
+        headers: createHeaders(token),
+      }),
+    }),
+    getNotes: builder.query({
+      query: ({ slug, search, page_size, page, exclude_by, token }) => ({
+        url: `/api/vault/notes/vaultdata/${slug ? `${slug}/` : ""}${buildQueryParams({ search, page_size, page, exclude_by })}`,
+        method: "GET",
+        headers: createHeaders(token),
+      }),
+    }),
+    updateNotes: builder.mutation({
+      query: ({ token, slug }) => ({
+        url: `/api/vault/notes/${slug ? `${slug}/` : ""}`,
+        method: "PATCH",
+        headers: createHeaders(token),
+      }),
+    }),
+    deleteNotes: builder.mutation({
+      query: ({ slug, token }) => ({
+        url: `/api/vault/notes/${slug ? `${slug}/` : ""}`,
         method: "DELETE",
         headers: createHeaders(token),
       }),

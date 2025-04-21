@@ -28,11 +28,10 @@ const TotpSchema = z.object({
     .max(6, { message: "Max character accept 6" }),
 });
 type Totpd = z.infer<typeof TotpSchema>;
-const defaultVaultPasswordValues: Totpd = {
+
+const defaultTotpd: Totpd = {
   token: "",
 };
-
-
 
 const Firststep = ({
   token,
@@ -46,7 +45,7 @@ const Firststep = ({
   const form = useForm<Totpd>({
     resolver: zodResolver(TotpSchema),
     mode: "onChange",
-    defaultValues: defaultVaultPasswordValues,
+    defaultValues: defaultTotpd,
   });
 
   const onSubmit = async (data: Totpd) => {

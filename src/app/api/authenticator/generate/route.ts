@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import speakeasy from "speakeasy";
 import QRCode from "qrcode";
-import { auth } from "@/auth"
+import { auth } from "@/auth";
 
 function xorEncryptDecrypt(data: string, key: string) {
   return Array.from(data)
     .map((char: string, index: number) =>
       String.fromCharCode(
-        char.charCodeAt(0) ^ key.charCodeAt(index % key.length)
-      )
+        char.charCodeAt(0) ^ key.charCodeAt(index % key.length),
+      ),
     )
     .join("");
 }
@@ -33,21 +33,21 @@ export async function GET(request: NextRequest) {
     if (!authorizationHeader) {
       return NextResponse.json(
         { error: "Missing encrypted data or authorization header" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const token = authorizationHeader.replace("Bearer ", "");
     const key = token.slice(0, 32);
-    const session = await auth()
+    const session = await auth();
     const issuer = encodeURIComponent("Password Manager");
-    const accountName = encodeURIComponent("https://pm.biki.com.np");
+    const accountName = session?.user?.email || "Unknown User";
     const logoUrl = encodeURIComponent("https://pm.biki.com.np/profile.png");
 
     if (!session?.user?.email) {
       return NextResponse.json(
         { error: "User email is missing" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -57,20 +57,20 @@ export async function GET(request: NextRequest) {
     });
 
     const otpauthUrl = `otpauth://totp/${issuer}:${accountName}?secret=${secret.base32}&issuer=${issuer}&image=${logoUrl}`;
-    
+
     const qrCodeData = await QRCode.toDataURL(otpauthUrl);
-    
+
     const normdata = {
       secret: secret.base32,
       qrCode: qrCodeData,
     };
-    
+
     const data = encryptData(normdata, key);
     return NextResponse.json({ data: data }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     if (!authorizationHeader) {
       return NextResponse.json(
         { error: "Missing encrypted data or authorization header" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     const body = await request.json();
@@ -107,17 +107,17 @@ export async function POST(request: NextRequest) {
           body: JSON.stringify({
             ...decryptedData,
           }),
-        }
+        },
       );
       if (response.ok) {
         return NextResponse.json(
           { data: { success: "App added" } },
-          { status: 201 }
+          { status: 201 },
         );
       } else {
         return NextResponse.json(
           { error: "Failed to Add app" },
-          { status: response.status }
+          { status: response.status },
         );
       }
     } else {
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

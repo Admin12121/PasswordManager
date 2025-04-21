@@ -131,7 +131,7 @@ const Sidebar = ({
       <TooltipProvider delayDuration={0}>
         <ResizablePanelGroup
           direction="horizontal"
-          className="h-full items-stretch max-w-[2400px]"
+          className="h-full items-stretch"
           onLayout={(sizes: number[]) => {
             document.cookie = `react-resizable-panels:layout:mail=${JSON.stringify(
               sizes
