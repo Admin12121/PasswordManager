@@ -171,37 +171,6 @@ const View = ({ logins }: { logins: VaultData[] }) => {
             <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
               <SelectItem value="1">
                 <div className="flex items-center gap-2">
-                  <LayoutGrid className="w-4 h-4 opacity-60" />
-                  All
-                </div>
-              </SelectItem>
-              <SelectItem value="2">
-                <div className="flex items-center gap-2">
-                  <UserRound className="w-4 h-4 opacity-60" />
-                  Login
-                </div>
-              </SelectItem>
-              <SelectItem value="3">
-                <div className="flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 opacity-60" />
-                  Credit Card
-                </div>
-              </SelectItem>
-              <SelectItem value="4">
-                <div className="flex items-center gap-2">
-                  <NotepadText className="w-4 h-4 opacity-60" />
-                  Note
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <Select defaultValue="1">
-            <SelectTrigger className="w-auto max-w-full min-w-48">
-              <SelectValue placeholder="Select framework" />
-            </SelectTrigger>
-            <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
-              <SelectItem value="1">
-                <div className="flex items-center gap-2">
                   <History className="w-4 h-4 opacity-60" />
                   History
                 </div>

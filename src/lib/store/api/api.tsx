@@ -160,7 +160,7 @@ export const userAuthapi = createApi({
     }),
     getNotes: builder.query({
       query: ({ slug, search, page_size, page, exclude_by, token }) => ({
-        url: `/api/vault/notes/vaultdata/${slug ? `${slug}/` : ""}${buildQueryParams({ search, page_size, page, exclude_by })}`,
+        url: `/api/vault/notes/${slug ? `${slug}/` : "vaultdata/"}${buildQueryParams({ search, page_size, page, exclude_by })}`,
         method: "GET",
         headers: createHeaders(token),
       }),
@@ -198,4 +198,7 @@ export const {
   useGetVaultQuery,
   useUpdateLoginsMutation,
   useDeleteLoginsMutation,
+  useGetNotesQuery,
+  useUpdateNotesMutation,
+  useDeleteNotesMutation,
 } = userAuthapi;

@@ -52,7 +52,6 @@ const ViewAll = () => {
 
   useEffect(() => {
     if (data) {
-      console.log(data);
       setLogins(data.results);
     }
   }, [data, page, exclude_by]);

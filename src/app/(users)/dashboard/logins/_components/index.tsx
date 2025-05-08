@@ -36,7 +36,6 @@ const ViewAll = () => {
   const [page, setPage] = useState<number>(1);
   const [exclude_by, SetExcludeBy] = useState<string>("");
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
-  console.log(user);
   const {
     data: encryptedData,
     isLoading,
