@@ -82,13 +82,9 @@ interface VaultData {
 
 const View = ({ logins }: { logins: VaultData[] }) => {
   const { accessToken } = useAuthUser();
-  const [slug, setSlug] = useState(logins.length > 0 ? logins[0].slug : "");
-  const [sec, setSec] = useState<boolean>(
-    logins.length > 0 ? logins[0].security : false,
-  );
-  const [appauth, setAppauth] = useState(
-    logins.length > 0 ? logins[0].authtoken : false,
-  );
+  const [slug, setSlug] = useState("");
+  const [sec, setSec] = useState<boolean>(false);
+  const [appauth, setAppauth] = useState(false);
   const [verified, setVerified] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -131,6 +127,18 @@ const View = ({ logins }: { logins: VaultData[] }) => {
   };
 
   const renderContent = () => {
+    if (!slug) {
+      return (
+        <div className="relative w-full h-full py-1 pl-1">
+          <div
+            className="h-full w-full border-2 border-dashed"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='7' height='7' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23888888' fill-opacity='0.15' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E")`,
+            }}
+          ></div>
+        </div>
+      );
+    }
     if (appauth) {
       return (
         <Firststep

@@ -27,6 +27,10 @@ import {
   CircleAlert,
   File,
   EllipsisIcon,
+  EllipsisVertical,
+  Pin,
+  Trash,
+  EyeOff,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -234,8 +238,13 @@ const View = ({ notes, refetch }: { notes: VaultData[]; refetch: any }) => {
   const renderContent = () => {
     if (!selectedSlug) {
       return (
-        <div className="flex items-center justify-center h-full">
-          {/* <LogoAnimation className="h-20 w-20" /> */}
+        <div className="relative w-full h-full p-1">
+          <div
+            className="h-full w-full border-2 border-dashed"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='7' height='7' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23888888' fill-opacity='0.15' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E")`,
+            }}
+          ></div>
         </div>
       );
     }
@@ -561,6 +570,33 @@ const View = ({ notes, refetch }: { notes: VaultData[]; refetch: any }) => {
                           </Button>
                         </>
                       ))}
+                    {!isNew && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            size={"icon"}
+                            type="button"
+                            variant="secondary"
+                          >
+                            <EllipsisVertical />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>
+                            <Pin className="w-4 h-4 rotate-45" />
+                            Pin item
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Trash className="w-4 h-4" />
+                            Move to Trash
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <EyeOff className="w-4 h-4" />
+                            Exclude from monitoring
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </>
                 )}
               </div>

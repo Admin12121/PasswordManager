@@ -47,44 +47,6 @@ export default {
       clientId: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_SECRET,
     }),
-    Credentials({
-      async authorize(credentials) {
-        const ValidateFields = LoginSchema.safeParse(credentials);
-        if (!ValidateFields.success) {
-          return null;
-        }
-        const { email, password } = ValidateFields.data;
-        const response = await fetch(
-          `${process.env.BACKEND_URL}/api/userauth/users/login/`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password }),
-          }
-        );
-        const data = await response.json();
-        if (!response.ok) {
-          const errorMessage = data.error || "Failed to log in";
-          console.log(errorMessage);
-          throw new Error(errorMessage);
-        }
-        if (data.message === "Acivation link sent to your email") {
-          return {
-            id: email,
-            email: email,
-            message: "Activation link sent to your email",
-          } as UserWithToken;
-        }
-        return {
-          id: email,
-          email: email,
-          token: data.token,
-          name: data.name,
-        } as UserWithToken;
-      },
-    }),
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
@@ -107,13 +69,13 @@ export default {
               username: user.name,
               profile: profile || user.image,
             }),
-          }
+          },
         );
 
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(
-            errorData.error || "Failed to process social login with Django"
+            errorData.error || "Failed to process social login with Django",
           );
         }
 

@@ -45,15 +45,6 @@ const Nav = () => {
                     <ChevronRight size={10} />
                   </Link>
                 </span>
-                <span className="transition-opacity duration-300 opacity-100">
-                  <Link
-                    href=""
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-zinc-600 h-9 px-4 py-2 gap-1"
-                  >
-                    Sign up
-                    <ChevronRight size={10} />
-                  </Link>
-                </span>
               </>
             )}
 

@@ -7,7 +7,6 @@ import { useState, useEffect } from "react";
 import { useGetLoggedUserQuery } from "@/lib/store/api/api";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { useDecryptedData } from "@/hooks/dec-data";
-import Changepassword from "./change_password";
 import Two_factor_auth from "./two_factor_authentication";
 import Login_alerts from "./login_alerts";
 import ChangeVaultpassword from "./vaultpassword";
@@ -85,7 +84,6 @@ const MainSettings = () => {
 
               <div className="rounded-lg w-full overflow-hidden mt-5 shadow-sm">
                 <div className="divide-y">
-                  <Changepassword user={user} accessToken={accessToken} />
                   <Two_factor_auth user={user} accessToken={accessToken} />
                   <ChangeVaultpassword user={user} accessToken={accessToken} />
                 </div>
