@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useGetVaultQuery } from "@/lib/store/api/api";
+import { useGetAllDataQuery } from "@/lib/store/api/api";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
@@ -37,7 +37,7 @@ const ViewAll = () => {
     data: encryptedData,
     isLoading,
     refetch,
-  } = useGetVaultQuery(
+  } = useGetAllDataQuery(
     { search, page_size: rowsperpage, page, exclude_by, token: accessToken },
     { skip: !accessToken },
   );

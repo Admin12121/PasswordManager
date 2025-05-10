@@ -20,6 +20,7 @@ import {
   History,
   LayoutGrid,
   CircleAlert,
+  File,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -251,20 +252,28 @@ const View = ({ logins }: { logins: VaultData[] }) => {
                 slug == data.slug && "dark:bg-neutral-800/50 bg-neutral-200/50",
               )}
             >
-              <Website
-                avatarProps={{
-                  name: `${data.username.slice(0, 1)}`,
-                  classNames: {
-                    base: "bg-gradient-to-br from-[#FFB457] to-[#FF705B] cursor-pointer",
-                    icon: "text-black/80",
-                  },
-                }}
-                classNames={{
-                  description: "text-default-500",
-                  name: "cursor-pointer",
-                }}
-                name={data.title}
-              />
+              {data.username ? (
+                <Website
+                  avatarProps={{
+                    name: `${data.username.slice(0, 1)}`,
+                    classNames: {
+                      base: "bg-gradient-to-br from-[#FFB457] to-[#FF705B] cursor-pointer",
+                      icon: "text-black/80",
+                    },
+                  }}
+                  classNames={{
+                    description: "text-default-500",
+                    name: "cursor-pointer",
+                  }}
+                  name={data.title}
+                />
+              ) : (
+                <Avatar>
+                  <AvatarFallback className="bg-transparent">
+                    <File className="w-6 h-6 stroke-white" />
+                  </AvatarFallback>
+                </Avatar>
+              )}
               <div className="text-left cursor-pointer">
                 <span className="flex items-center gap-x-1 flex-nowrap">
                   <span className="text-ellipsis">{data.title}</span>
