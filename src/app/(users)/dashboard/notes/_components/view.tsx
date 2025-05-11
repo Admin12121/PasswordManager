@@ -119,10 +119,19 @@ const defaultFormValues: FormValues = {
   authtoken: false,
 };
 
-const View = ({ notes, refetch }: { notes: VaultData[]; refetch: any }) => {
+const View = ({
+  notes,
+  refetch,
+  isNew,
+  setIsNew,
+}: {
+  notes: VaultData[];
+  refetch: any;
+  isNew: boolean;
+  setIsNew: any;
+}) => {
   const { accessToken, user } = useAuthUser();
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
-  const [isNew, setIsNew] = useState<boolean>(false);
   const [sec, setSec] = useState<boolean>(false);
   const [appauth, setAppauth] = useState(false);
   const [verified, setVerified] = useState(false);
@@ -151,25 +160,11 @@ const View = ({ notes, refetch }: { notes: VaultData[]; refetch: any }) => {
     setSec(false);
   };
 
-  const [editing, setEditing] = useState(true);
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    mode: "onChange",
-    defaultValues: defaultFormValues,
-  });
-
-  const { reset, setValue, getValues, watch, formState, trigger } = form;
-  const { dirtyFields } = formState;
-
   const {
     data: encryptedUserData,
     isLoading: vaultloading,
     refetch: profilerefetch,
-  } = useGetLoggedUserQuery(
-    { token: accessToken },
-    { skip: !accessToken && !getValues("security") },
-  );
+  } = useGetLoggedUserQuery({ token: accessToken }, { skip: !accessToken });
 
   const { data: userdata, loading: vaultLoader } = useDecryptedData(
     encryptedUserData,
@@ -182,36 +177,6 @@ const View = ({ notes, refetch }: { notes: VaultData[]; refetch: any }) => {
     }
   }, [userdata, vaultLoader]);
 
-  const editor = useEditor({
-    extensions: [
-      CustomDocument,
-      StarterKit.configure({ document: false }),
-      Placeholder.configure({
-        placeholder: ({ node }) =>
-          node.type.name === "heading" ? "What’s the title?" : "",
-        emptyEditorClass: "text-neutral-300 dark:text-neutral-500",
-      }),
-    ],
-    content: getValues("note"),
-    editable: editing,
-    onUpdate: ({ editor }) => {
-      setValue("note", editor.getHTML());
-      trigger("note");
-    },
-  });
-
-  const toggleEdit = useCallback(
-    (enable: boolean) => {
-      setEditing(enable);
-      editor?.setEditable(enable);
-    },
-    [editor],
-  );
-
-  useEffect(() => {
-    editor?.setEditable(editing);
-  }, [editing, editor]);
-
   const handleSelectNote = ({
     slug,
     sec,
@@ -222,18 +187,23 @@ const View = ({ notes, refetch }: { notes: VaultData[]; refetch: any }) => {
     authtoken: boolean;
   }) => {
     if (slug === selectedSlug) return;
-    setIsNew(slug === "default-note");
+    setIsNew(false);
     setSec(sec);
     setSelectedSlug(slug);
     setAppauth(authtoken);
     setVerified(false);
     setProgress(0);
-    if (editor && slug === "default-note") {
-      setEditing(true);
-      editor.commands.setContent("");
-      reset();
-    }
   };
+
+  useEffect(() => {
+    if (isNew) {
+      setSec(false);
+      setSelectedSlug("default-note");
+      setAppauth(false);
+      setVerified(false);
+      setProgress(0);
+    }
+  }, [isNew]);
 
   const renderContent = () => {
     if (!selectedSlug) {
@@ -275,190 +245,10 @@ const View = ({ notes, refetch }: { notes: VaultData[]; refetch: any }) => {
     } else {
       return (
         selectedSlug && (
-          <NoteEditorPlaceholder
-            editor={editor}
-            watch={watch}
-            setValue={setValue}
-            editing={editing}
-          />
+          <NoteEditorPlaceholder slug={selectedSlug} refetch={refetch} />
         )
       );
     }
-  };
-
-  const onSubmit = async () => {
-    const data = getValues();
-    if (!accessToken) return;
-    const toastId = toast.loading("Updating...", { position: "top-center" });
-    await delay(500);
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(data.note!, "text/html");
-    const h1Element = doc.querySelector("h1");
-    const title = h1Element ? h1Element.textContent?.trim() || "" : "";
-
-    if (!title) {
-      toast.error("No <h1> tag found in the note!", { id: toastId });
-      return;
-    }
-
-    setValue("title", title);
-
-    const rawdata = getValues();
-    if (veruser && !veruser?.vaultpassword) {
-      toast.error("Vault password required to enablle it....", {
-        id: toastId,
-        position: "top-center",
-      });
-      return;
-    }
-    toast.success("Encrypting Data...", {
-      id: toastId,
-      position: "top-center",
-    });
-    const newData = encryptData(rawdata, accessToken);
-    await delay(500);
-    try {
-      const response = await fetch("/api/vault/notes/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ data: newData }),
-      });
-      if (response.ok) {
-        reset();
-        toast.success("Saved", {
-          id: toastId,
-          position: "top-center",
-        });
-        refetch();
-      } else {
-        toast.error("Something went wrong", {
-          id: toastId,
-          position: "top-center",
-        });
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  const { data: encryptedData, isLoading } = useGetNotesQuery(
-    { slug: selectedSlug, token: accessToken },
-    {
-      skip:
-        !accessToken ||
-        !selectedSlug ||
-        isNew ||
-        ((sec || appauth) && !verified),
-    },
-  );
-
-  const { data, loading } = useDecryptedData(encryptedData, isLoading);
-
-  useEffect(() => {
-    if (data) {
-      setValue("slug", data.slug);
-      setValue("note", data.note);
-      setValue("security", data.security);
-      setValue("authtoken", data.authtoken);
-      if (editor && data.note) {
-        editor.commands.setContent(data.note);
-        setEditing(false);
-      }
-    }
-  }, [data]);
-
-  const onUpdate = async () => {
-    const olddata = getValues();
-    if (!accessToken) return;
-    const toastId = toast.loading("Updating...", { position: "top-center" });
-    await delay(500);
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(olddata.note!, "text/html");
-    const h1Element = doc.querySelector("h1");
-    const title = h1Element ? h1Element.textContent?.trim() || "" : "";
-
-    if (!title) {
-      toast.error("No <h1> tag found in the note!", { id: toastId });
-      return;
-    }
-
-    setValue("title", title);
-
-    const rawdata = getValues();
-    const fieldsToCheck = ["note", "authtoken", "security", "title"] as const;
-
-    const hasChanges = fieldsToCheck.some((key) => rawdata[key] !== data[key]);
-
-    if (!hasChanges) {
-      toast.error("No changes detected", {
-        id: toastId,
-        position: "top-center",
-      });
-      return;
-    }
-
-    if (veruser && !veruser?.vaultpassword) {
-      toast.error("Vault password required to enablle it....", {
-        id: toastId,
-        position: "top-center",
-      });
-      return;
-    }
-    toast.success("Encrypting Data...", {
-      id: toastId,
-      position: "top-center",
-    });
-    const newData = encryptData(rawdata, accessToken);
-    await delay(500);
-    try {
-      const response = await fetch("/api/vault/notes/", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ data: newData }),
-      });
-      if (response.ok) {
-        reset();
-        toggleEdit(false);
-        toast.success("Updated SuccessFull", {
-          id: toastId,
-          position: "top-center",
-        });
-        refetch();
-      } else {
-        toast.error("Something went wrong", {
-          id: toastId,
-          position: "top-center",
-        });
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  const isNoteEmptyOrOnlyH1 = (note?: string): boolean => {
-    if (!note || note.trim() === "") {
-      return true;
-    }
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(note, "text/html");
-    const h1Element = doc.querySelector("h1");
-    if (
-      h1Element &&
-      h1Element.textContent?.trim() === "" &&
-      doc.body.childElementCount === 1
-    ) {
-      return true;
-    }
-
-    return false;
   };
 
   return (
@@ -529,76 +319,6 @@ const View = ({ notes, refetch }: { notes: VaultData[]; refetch: any }) => {
                 <span className="flex items-center gap-x-1 flex-nowrap">
                   <span className="text-ellipsis">{data.title}</span>
                 </span>
-              </div>
-              <div className="ml-auto flex items-center gap-2">
-                {selectedSlug === data.slug && (
-                  <>
-                    {isNew && !isNoteEmptyOrOnlyH1(getValues("note")) && (
-                      <Button
-                        type="submit"
-                        onClick={() => onSubmit()}
-                        className="hover:text-white"
-                      >
-                        Save
-                      </Button>
-                    )}
-                    {!isNew &&
-                      (!editing ? (
-                        <Button
-                          type="button"
-                          onClick={() => toggleEdit(true)}
-                          className="hover:text-white"
-                        >
-                          Edit
-                        </Button>
-                      ) : (
-                        <>
-                          <Button
-                            type="button"
-                            onClick={() => onUpdate()}
-                            className="hover:text-white"
-                          >
-                            Update
-                          </Button>
-                          <Button
-                            type="button"
-                            onClick={() => toggleEdit(false)}
-                            className="hover:text-white"
-                            variant="secondary"
-                          >
-                            Cancel
-                          </Button>
-                        </>
-                      ))}
-                    {!isNew && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            size={"icon"}
-                            type="button"
-                            variant="secondary"
-                          >
-                            <EllipsisVertical />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem>
-                            <Pin className="w-4 h-4 rotate-45" />
-                            Pin item
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Trash className="w-4 h-4" />
-                            Move to Trash
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <EyeOff className="w-4 h-4" />
-                            Exclude from monitoring
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </>
-                )}
               </div>
             </div>
           ))}

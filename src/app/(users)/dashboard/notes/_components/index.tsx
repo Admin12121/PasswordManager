@@ -35,6 +35,7 @@ const ViewAll = () => {
   );
   const { data } = useDecryptedData(encryptedData, isLoading);
   const [notes, setNotes] = useState<VaultData[]>([]);
+  const [isNew, setisNew] = useState<boolean>(false);
 
   useEffect(() => {
     if (encryptedData) {
@@ -44,13 +45,7 @@ const ViewAll = () => {
 
   useEffect(() => {
     if (data) {
-      const defaultNote: VaultData = {
-        security: false,
-        slug: "default-note",
-        title: "Untitled Note",
-        authtoken: false,
-      };
-      setNotes([defaultNote, ...data.results]);
+      setNotes(data.results);
     }
   }, [data, page, exclude_by]);
 
@@ -92,8 +87,17 @@ const ViewAll = () => {
             )}
           </div>
         </div>
+        <div className="flex gap-3 pr-3">
+          <Button
+            variant="outline"
+            onClick={() => setisNew(true)}
+            className="flex h-8 gap-2 p-0 px-2 data-[state=open]:bg-muted"
+          >
+            <Plus className="w-4 h-4" /> Add Note
+          </Button>
+        </div>
       </div>
-      <View notes={notes} refetch={refetch} />
+      <View notes={notes} refetch={refetch} isNew={isNew} setIsNew={setisNew} />
     </div>
   );
 };

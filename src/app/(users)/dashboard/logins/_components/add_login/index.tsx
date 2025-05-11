@@ -150,7 +150,6 @@ const LoginForm = ({
         if (response.ok) {
           const res = await response.json();
           reset();
-          router.push(res.data.slug);
           toast.success("Added SuccessFull", {
             id: toastId,
             position: "top-center",

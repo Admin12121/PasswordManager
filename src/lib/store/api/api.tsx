@@ -179,6 +179,13 @@ export const userAuthapi = createApi({
         headers: createHeaders(token),
       }),
     }),
+    trashNotes: builder.mutation({
+      query: ({ slug, token }) => ({
+        url: `/api/vault/notes/${slug ? `${slug}/` : ""}trash/`,
+        method: "DELETE",
+        headers: createHeaders(token),
+      }),
+    }),
     deleteNotes: builder.mutation({
       query: ({ slug, token }) => ({
         url: `/api/vault/notes/${slug ? `${slug}/` : ""}`,
@@ -208,5 +215,6 @@ export const {
   useDeleteLoginsMutation,
   useGetNotesQuery,
   useUpdateNotesMutation,
+  useTrashNotesMutation,
   useDeleteNotesMutation,
 } = userAuthapi;

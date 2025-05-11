@@ -29,6 +29,7 @@ import LogoAnimation, {
   AnimatedNumber,
 } from "@/components/global/logo_animation";
 import { useAuthUser } from "@/hooks/use-auth-user";
+import NoteView from "./notes";
 
 interface SiteProps {
   avatarProps: {
@@ -84,6 +85,7 @@ interface VaultData {
 const View = ({ logins }: { logins: VaultData[] }) => {
   const { accessToken } = useAuthUser();
   const [slug, setSlug] = useState("");
+  const [data_type, setType] = useState<"note" | "login" | "wallet">("login");
   const [sec, setSec] = useState<boolean>(false);
   const [appauth, setAppauth] = useState(false);
   const [verified, setVerified] = useState(false);
@@ -112,14 +114,17 @@ const View = ({ logins }: { logins: VaultData[] }) => {
   };
 
   const ToggleData = ({
+    data_type,
     slug,
     sec,
     authtoken,
   }: {
+    data_type: "note" | "login" | "wallet";
     slug: string;
     sec: boolean;
     authtoken: boolean;
   }) => {
+    setType(data_type);
     setSec(sec);
     setSlug(slug);
     setAppauth(authtoken);
@@ -165,7 +170,14 @@ const View = ({ logins }: { logins: VaultData[] }) => {
         </LogoAnimation>
       );
     } else {
-      return slug && <ContentData slug={slug} />;
+      return (
+        slug &&
+        (data_type == "login" ? (
+          <ContentData slug={slug} />
+        ) : (
+          <NoteView slug={slug} />
+        ))
+      );
     }
   };
 
@@ -241,6 +253,7 @@ const View = ({ logins }: { logins: VaultData[] }) => {
             <div
               onClick={() => {
                 ToggleData({
+                  data_type: data.username ? "login" : "note",
                   slug: data.slug,
                   sec: data.security,
                   authtoken: data.authtoken,

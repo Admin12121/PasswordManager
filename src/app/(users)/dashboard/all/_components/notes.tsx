@@ -1,23 +1,38 @@
-"use client";
-
-import React, { useState, useCallback, useEffect } from "react";
-import {
-  useGetLoginsQuery,
-  useGetLoggedUserQuery,
-  useSetvaultpasswordMutation,
-  useGetNotesQuery,
-  useTrashNotesMutation,
-} from "@/lib/store/api/api";
-import { useEditor, Editor, EditorContent } from "@tiptap/react";
+import { useEffect, useState, useCallback } from "react";
 import Document from "@tiptap/extension-document";
 import Placeholder from "@tiptap/extension-placeholder";
+import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import "./style.css";
-import { encryptData, useDecryptedData } from "@/hooks/dec-data";
+import { Button } from "@/components/ui/button";
+import {
+  useGetNotesQuery,
+  useVerifyvaultpasswordMutation,
+  useGetLoggedUserQuery,
+  useSetvaultpasswordMutation,
+} from "@/lib/store/api/api";
+import { items } from "@/components/global/sites";
+import {
+  ArrowUpDown,
+  CreditCard,
+  UserRound,
+  NotepadText,
+  History,
+  LayoutGrid,
+  CircleAlert,
+  File,
+  EllipsisIcon,
+  EllipsisVertical,
+  Pin,
+  Trash,
+  EyeOff,
+} from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import LogoAnimation, {
+  AnimatedNumber,
+} from "@/components/global/logo_animation";
 import { useAuthUser } from "@/hooks/use-auth-user";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { motion } from "framer-motion";
 import {
   Form,
   FormControl,
@@ -26,17 +41,55 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { UserData } from "@/schemas";
+import { Input } from "@/components/ui/input";
+import { z } from "zod";
 import { toast } from "sonner";
 import { delay } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { encryptData } from "@/hooks/dec-data";
+import { useDecryptedData } from "@/hooks/dec-data";
+import { UserData } from "@/schemas";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { TrashIcon } from "@radix-ui/react-icons";
 import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const CustomDocument = Document.extend({
   content: "heading block*",
 });
+
+interface SiteProps {
+  avatarProps: {
+    name: string;
+    icon?: any;
+    classNames?: {
+      base?: string;
+      icon?: string;
+    };
+  };
+  classNames?: {
+    base?: string;
+    description?: string;
+    name?: string;
+  };
+  name: string;
+}
+
+interface VaultData {
+  security: boolean;
+  slug: string;
+  title: string;
+  authtoken: boolean;
+}
 
 const formSchema = z.object({
   slug: z.string(),
@@ -59,12 +112,8 @@ const vaultPasswordSchema = z.object({
     .max(128, { message: "Password must be less than 128 characters" }),
 });
 
-type FormValues = z.infer<typeof formSchema>;
 type VaultPassword = z.infer<typeof vaultPasswordSchema>;
-
-const defaultVaultPasswordValues: VaultPassword = {
-  vaultpassword: "",
-};
+type FormValues = z.infer<typeof formSchema>;
 
 const defaultFormValues: FormValues = {
   slug: "",
@@ -74,21 +123,15 @@ const defaultFormValues: FormValues = {
   authtoken: false,
 };
 
-export default function NoteEditorPlaceholder({
-  slug,
-  refetch,
-}: {
-  slug: string;
-  refetch: any;
-}) {
+const defaultVaultPasswordValues: VaultPassword = {
+  vaultpassword: "",
+};
+
+const NoteView = ({ slug }: { slug: string }) => {
   const { accessToken } = useAuthUser();
-  const [setvault] = useSetvaultpasswordMutation();
-  const [trash] = useTrashNotesMutation();
   const [user, setUser] = useState<UserData>();
-  const [isnew, setNew] = useState<boolean>(
-    slug == "default-note" ? true : false,
-  );
   const [editing, setEditing] = useState(true);
+  const [setvault] = useSetvaultpasswordMutation();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -96,16 +139,69 @@ export default function NoteEditorPlaceholder({
     defaultValues: defaultFormValues,
   });
 
-  const { reset, setValue, getValues, watch, trigger } = form;
-
-  const security = watch("security");
-  const authtoken = watch("authtoken");
-
   const vaultPasswordForm = useForm<VaultPassword>({
     resolver: zodResolver(vaultPasswordSchema),
     mode: "onChange",
     defaultValues: defaultVaultPasswordValues,
   });
+
+  const { reset, setValue, getValues, watch, formState, trigger } = form;
+  const { dirtyFields } = formState;
+
+  const editor = useEditor({
+    extensions: [
+      CustomDocument,
+      StarterKit.configure({ document: false }),
+      Placeholder.configure({
+        placeholder: ({ node }) =>
+          node.type.name === "heading" ? "What’s the title?" : "",
+        emptyEditorClass: "text-neutral-300 dark:text-neutral-500",
+      }),
+    ],
+    content: getValues("note"),
+    editable: editing,
+    onUpdate: ({ editor }) => {
+      setValue("note", editor.getHTML());
+      trigger("note");
+    },
+  });
+
+  const toggleEdit = useCallback(
+    (enable: boolean) => {
+      setEditing(enable);
+      editor?.setEditable(enable);
+    },
+    [editor],
+  );
+
+  useEffect(() => {
+    editor?.setEditable(editing);
+  }, [editing, editor]);
+
+  const { data: encryptedData, isLoading } = useGetNotesQuery(
+    { slug: slug, token: accessToken },
+    {
+      skip: !accessToken || !slug,
+    },
+  );
+
+  const { data, loading } = useDecryptedData(encryptedData, isLoading);
+
+  useEffect(() => {
+    if (data) {
+      setValue("slug", data.slug);
+      setValue("note", data.note);
+      setValue("security", data.security);
+      setValue("authtoken", data.authtoken);
+      if (editor && data.note) {
+        editor.commands.setContent(data.note);
+        setEditing(false);
+      }
+    }
+  }, [data]);
+
+  const security = watch("security");
+  const authtoken = watch("authtoken");
 
   const {
     data: encryptedUserData,
@@ -113,7 +209,7 @@ export default function NoteEditorPlaceholder({
     refetch: profilerefetch,
   } = useGetLoggedUserQuery(
     { token: accessToken },
-    { skip: !accessToken && !security && isnew },
+    { skip: !accessToken && !security },
   );
 
   const { data: userdata, loading: vaultLoader } = useDecryptedData(
@@ -150,123 +246,6 @@ export default function NoteEditorPlaceholder({
       console.error("Error:", error);
     }
   }, []);
-
-  const editor = useEditor({
-    extensions: [
-      CustomDocument,
-      StarterKit.configure({ document: false }),
-      Placeholder.configure({
-        placeholder: ({ node }) =>
-          node.type.name === "heading" ? "What’s the title?" : "",
-        emptyEditorClass: "text-neutral-300 dark:text-neutral-500",
-      }),
-    ],
-    content: getValues("note"),
-    editable: editing,
-    onUpdate: ({ editor }) => {
-      setValue("note", editor.getHTML());
-      trigger("note");
-    },
-  });
-
-  const toggleEdit = useCallback(
-    (enable: boolean) => {
-      setEditing(enable);
-      editor?.setEditable(enable);
-    },
-    [editor],
-  );
-
-  useEffect(() => {
-    editor?.setEditable(editing);
-  }, [editing, editor]);
-
-  const { data: encryptedData, isLoading } = useGetNotesQuery(
-    { slug: slug, token: accessToken },
-    {
-      skip: !accessToken || !slug || slug == "default-note",
-    },
-  );
-
-  const { data, loading } = useDecryptedData(encryptedData, isLoading);
-
-  useEffect(() => {
-    if (data) {
-      setNew(false);
-      setValue("slug", data.slug);
-      setValue("note", data.note);
-      setValue("security", data.security);
-      setValue("authtoken", data.authtoken);
-      if (editor && data.note) {
-        editor.commands.setContent(data.note);
-        setEditing(false);
-      }
-    } else {
-      setNew(true);
-    }
-  }, [data]);
-
-  const onSubmit = async () => {
-    const data = getValues();
-    if (!accessToken) return;
-    const toastId = toast.loading("Updating...", { position: "top-center" });
-    await delay(500);
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(data.note!, "text/html");
-    const h1Element = doc.querySelector("h1");
-    const title = h1Element ? h1Element.textContent?.trim() || "" : "";
-
-    if (!title) {
-      toast.error("No <h1> tag found in the note!", { id: toastId });
-      return;
-    }
-
-    setValue("title", title);
-
-    const rawdata = getValues();
-    if (user && !user?.vaultpassword) {
-      toast.error("Vault password required to enablle it....", {
-        id: toastId,
-        position: "top-center",
-      });
-      return;
-    }
-    toast.success("Encrypting Data...", {
-      id: toastId,
-      position: "top-center",
-    });
-    const newData = encryptData(rawdata, accessToken);
-    await delay(500);
-    try {
-      const response = await fetch("/api/vault/notes/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ data: newData }),
-      });
-      if (response.ok) {
-        reset();
-        toast.success("Saved", {
-          id: toastId,
-          position: "top-center",
-        });
-        refetch();
-        if (editor) {
-          editor.commands.setContent("");
-        }
-      } else {
-        toast.error("Something went wrong", {
-          id: toastId,
-          position: "top-center",
-        });
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
 
   const onUpdate = async () => {
     const olddata = getValues();
@@ -322,7 +301,7 @@ export default function NoteEditorPlaceholder({
         body: JSON.stringify({ data: newData }),
       });
       if (response.ok) {
-        refetch();
+        reset();
         toggleEdit(false);
         toast.success("Updated SuccessFull", {
           id: toastId,
@@ -339,64 +318,14 @@ export default function NoteEditorPlaceholder({
     }
   };
 
-  const onTrash = async () => {
-    if (!accessToken) return;
-    const toastId = toast.loading("Updating...", { position: "top-center" });
-    await delay(500);
-    toast.success("Moving to Trash..", {
-      id: toastId,
-      position: "top-center",
-    });
-    await delay(500);
-    try {
-      const response = await trash({ slug, token: accessToken });
-      if (response.data) {
-        reset();
-        toast.success("Moved", {
-          id: toastId,
-          position: "top-center",
-        });
-        refetch();
-        if (editor) {
-          editor.commands.setContent("");
-        }
-      } else {
-        toast.error("Something went wrong", {
-          id: toastId,
-          position: "top-center",
-        });
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  const isNoteEmptyOrOnlyH1 = (note?: string): boolean => {
-    if (!note || note.trim() === "") {
-      return true;
-    }
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(note, "text/html");
-    const h1Element = doc.querySelector("h1");
-    if (
-      h1Element &&
-      h1Element.textContent?.trim() === "" &&
-      doc.body.childElementCount === 1
-    ) {
-      return true;
-    }
-    return false;
-  };
-
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full w-full">
       <div className="flex-grow overflow-auto">
         <EditorContent
           editor={editor}
           className="h-full overflow-auto w-full p-3 outline-none border-0 focus:outline-none"
         />
       </div>
-
       <div className="w-full h-auto">
         <div className="relative flex w-full items-start gap-2 rounded-lg p-4 has-[[data-state=checked]]:border-ring">
           <Switch
@@ -468,56 +397,46 @@ export default function NoteEditorPlaceholder({
           </div>
         </div>
         <div className="relative flex w-full items-start gap-2 rounded-lg px-4 py-2 has-[[data-state=checked]]:border-ring">
-          {!isnew ? (
-            !editing ? (
-              <>
-                <Button
-                  type="button"
-                  onClick={() => toggleEdit(true)}
-                  className="hover:text-white w-full"
-                >
-                  Edit
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => onTrash()}
-                  className="hover:text-white w-full"
-                >
-                  Trash
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  type="button"
-                  onClick={() => onUpdate()}
-                  className="hover:text-white w-full"
-                >
-                  Update
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => toggleEdit(false)}
-                  className="hover:text-white w-full"
-                  variant="secondary"
-                >
-                  Cancel
-                </Button>
-              </>
-            )
+          {!editing ? (
+            <>
+              <Button
+                type="button"
+                onClick={() => toggleEdit(true)}
+                className="hover:text-white w-full"
+              >
+                Edit
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                // onClick={() => toggleEdit(true)}
+                className="hover:text-white w-full"
+              >
+                Trash
+              </Button>
+            </>
           ) : (
-            <Button
-              type="button"
-              onClick={() => onSubmit()}
-              disabled={isNoteEmptyOrOnlyH1(getValues("note"))}
-              className="hover:text-white w-full"
-            >
-              Save
-            </Button>
+            <>
+              <Button
+                type="button"
+                onClick={() => onUpdate()}
+                className="hover:text-white w-full"
+              >
+                Update
+              </Button>
+              <Button
+                type="button"
+                onClick={() => toggleEdit(false)}
+                className="hover:text-white w-full"
+                variant="secondary"
+              >
+                Cancel
+              </Button>
+            </>
           )}
         </div>
       </div>
     </div>
   );
-}
+};
+export default NoteView;
