@@ -325,9 +325,9 @@ const ContentData = ({ slug }: ViewLoginProps) => {
       {update && (
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex gap-3 w-full items-center flex-col mt-5"
+          className="flex gap-3 w-full h-full items-center flex-col"
         >
-          <div className="p-3 space-y-2 w-full">
+          <div className="p-3 space-y-2 w-full flex-grow mt-2">
             <div className="space-y-2">
               <FormField
                 control={form.control}
@@ -520,28 +520,8 @@ const ContentData = ({ slug }: ViewLoginProps) => {
                 )}
               />
             </div>
-            {update && (
-              <>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="absolute right-24 top-0"
-                  onClick={() => setUpdate(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="secondary"
-                  className="absolute right-0 top-0"
-                  disabled={!isDirty}
-                >
-                  Update
-                </Button>
-              </>
-            )}
           </div>
-          <div className="w-full h-full">
+          <div className="w-full h-auto">
             <div className="relative flex w-full items-start gap-2 rounded-lg p-4 has-[[data-state=checked]]:border-ring">
               <FormField
                 control={form.control}
@@ -624,6 +604,28 @@ const ContentData = ({ slug }: ViewLoginProps) => {
                   accessing this login.
                 </p>
               </div>
+            </div>
+            <div className="relative flex w-full items-start gap-2 rounded-lg p-4 has-[[data-state=checked]]:border-ring mt-5">
+              {update && (
+                <>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="w-full"
+                    onClick={() => setUpdate(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="secondary"
+                    className="w-full"
+                    disabled={!isDirty}
+                  >
+                    Update
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </form>

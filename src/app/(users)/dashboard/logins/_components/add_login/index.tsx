@@ -242,11 +242,11 @@ const LoginForm = ({
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className={cn(
-          "flex gap-3 w-full items-center flex-col lg:flex-row",
+          "flex gap-3 w-full h-full items-center flex-col lg:flex-row",
           className,
         )}
       >
-        <div className="py-3 space-y-2 w-full">
+        <div className="py-3 space-y-2 w-full flex-grow">
           <div className="space-y-2">
             <FormField
               control={form.control}
@@ -394,7 +394,7 @@ const LoginForm = ({
             />
           </div>
         </div>
-        <div className={cn("w-full h-full", security)}>
+        <div className={cn("w-full h-auto", security)}>
           <div className="relative flex w-full items-start gap-2 rounded-lg py-4 has-[[data-state=checked]]:border-ring">
             <FormField
               control={form.control}

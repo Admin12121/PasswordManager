@@ -11,14 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
 import Empty from "./empty";
 const View = dynamic(() => import("./view"), { ssr: false });
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import LoginForm from "./add_login";
 
 interface VaultData {
@@ -46,6 +38,7 @@ const ViewAll = () => {
   );
   const { data } = useDecryptedData(encryptedData, isLoading);
   const [logins, setLogins] = useState<VaultData[]>([]);
+  const [isNew, setIsNew] = useState<boolean>(false);
 
   useEffect(() => {
     if (encryptedData) {
@@ -98,26 +91,16 @@ const ViewAll = () => {
           </div>
         </div>
         <div className="flex gap-3 pr-3">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                className="flex h-8 gap-2 p-0 px-2 data-[state=open]:bg-muted"
-              >
-                <Plus className="w-4 h-4" /> Add Login
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="min-w-[800px]">
-              <SheetHeader>
-                <SheetTitle>Add Login</SheetTitle>
-              </SheetHeader>
-              <LoginForm className="lg:flex-col" />
-            </SheetContent>
-          </Sheet>
+          <Button
+            variant="outline"
+            onClick={() => setIsNew(true)}
+            className="flex h-8 gap-2 p-0 px-2 data-[state=open]:bg-muted"
+          >
+            <Plus className="w-4 h-4" /> Add Login
+          </Button>
         </div>
       </div>
-      {data && data.count == 0 && <Empty />}
-      {data && data.count > 0 && <View logins={logins} />}
+      <View logins={logins} isNew={isNew} setIsNew={setIsNew} />
     </div>
   );
 };

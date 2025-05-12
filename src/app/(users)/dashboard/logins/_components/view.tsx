@@ -80,7 +80,15 @@ interface VaultData {
   authtoken: boolean;
 }
 
-const View = ({ logins }: { logins: VaultData[] }) => {
+const View = ({
+  logins,
+  isNew,
+  setIsNew,
+}: {
+  logins: VaultData[];
+  isNew: boolean;
+  setIsNew: any;
+}) => {
   const { accessToken } = useAuthUser();
   const [slug, setSlug] = useState("");
   const [sec, setSec] = useState<boolean>(false);
@@ -119,6 +127,7 @@ const View = ({ logins }: { logins: VaultData[] }) => {
     sec: boolean;
     authtoken: boolean;
   }) => {
+    setIsNew(false);
     setSec(sec);
     setSlug(slug);
     setAppauth(authtoken);
@@ -127,6 +136,9 @@ const View = ({ logins }: { logins: VaultData[] }) => {
   };
 
   const renderContent = () => {
+    if (isNew) {
+      return <LoginForm className="lg:flex-col p-3" />;
+    }
     if (!slug) {
       return (
         <div className="relative w-full h-full py-1 pl-1">
@@ -267,6 +279,7 @@ import { toast } from "sonner";
 import { delay } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import LoginForm from "./add_login";
 
 const vaultPasswordSchema = z.object({
   vaultpassword: z
