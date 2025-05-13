@@ -61,7 +61,7 @@ export function UserNav({ align }: { align?: "center" | "end" | "start" }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative p-0 h-12 w-12 rounded-lg">
+        <Button variant="ghost" className="relative p-0 h-8 w-8 rounded-lg">
           <Avatar className="h-12 w-12 rounded-lg">
             <AvatarImage src={user?.profile || ""} alt={user?.username} />
             <AvatarFallback>

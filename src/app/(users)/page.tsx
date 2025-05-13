@@ -14,7 +14,7 @@ export default function Home() {
   const [user, setUser] = useState<UserData>();
   const { data: encryptedData, isLoading } = useGetLoggedUserQuery(
     { token: accessToken },
-    { skip: !accessToken },
+    { skip: !accessToken }
   );
   const { data, loading } = useDecryptedData(encryptedData, isLoading);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -116,7 +116,7 @@ export default function Home() {
               alt="Hero"
               width={1000}
               height={600}
-              className="mx-auto p-2 rounded-xl border object-contain p-1 shadow-lg 2xl:max-w-[1092px] "
+              className="mx-auto p-2 rounded-xl border object-contain shadow-lg 2xl:max-w-[1092px] "
               style={{ color: "transparent" }}
             />
           </div>
@@ -207,6 +207,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+        <div className="h-8 w-full border-y md:h-12 lg:h-[112px]">
+          <div className="container h-full w-full border-x" />
+        </div>
       <section>
         <div className="">
           <div className="container flex flex-col gap-6 border-x py-4 max-lg:border-x lg:py-8">
@@ -243,127 +246,19 @@ export default function Home() {
         </div>
       </section>
       <footer className="border-t">
-        <div className="container flex justify-between gap-8 border-x py-4 max-md:flex-col lg:py-8">
-          <div className="mb-8 flex-1">
-            <Link className="flex items-center gap-1" href="/">
-              <Image
-                alt="logo"
-                loading="lazy"
-                width={32}
-                height={32}
-                decoding="async"
-                data-nimg={1}
-                className=""
-                style={{ color: "transparent" }}
-                src="/logo.svg"
-              />
-              <span className="text-2xl leading-0 font-semibold">Relative</span>
-            </Link>
-          </div>
-          <div className="flex flex-1 justify-between gap-8 max-sm:flex-col">
-            <div>
-              <h3 className="text-muted-foreground-subtle text-sm tracking-[-0.28px]">
-                Product
-              </h3>
-              <ul className="mt-6 space-y-6 text-sm tracking-[-0.28px] lg:mt-8 lg:space-y-8">
-                <li className="hover:text-primary">
-                  <Link href="#">Features</Link>
-                </li>
-                <li className="hover:text-primary">
-                  <Link href="#">Pricing</Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-muted-foreground-subtle text-sm tracking-[-0.28px]">
-                Company
-              </h3>
-              <ul className="mt-6 space-y-6 text-sm tracking-[-0.28px] lg:mt-8 lg:space-y-8">
-                <li className="hover:text-primary">
-                  <Link href="/contact">Contact</Link>
-                </li>
-                <li className="hover:text-primary">
-                  <Link href="#">Faq</Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-muted-foreground-subtle text-sm tracking-[-0.28px]">
-                Legal
-              </h3>
-              <ul className="mt-6 space-y-6 text-sm tracking-[-0.28px] lg:mt-8 lg:space-y-8">
-                <li className="hover:text-primary">
-                  <Link href="/terms-of-service">Terms of Service</Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-muted-foreground-subtle text-sm tracking-[-0.28px]">
-                Social
-              </h3>
-              <div className="text-muted-foreground-subtle mt-6 flex gap-3 lg:mt-8">
-                <Link aria-label="Instagram" href="https://instagram.com">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width={20}
-                    height={20}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-instagram"
-                  >
-                    <rect width={20} height={20} x={2} y={2} rx={5} ry={5} />
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-                  </svg>
-                </Link>
-                <Link aria-label="Twitter" href="https://twitter.com">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width={20}
-                    height={20}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-twitter"
-                  >
-                    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
-                  </svg>
-                </Link>
-                <Link aria-label="Linkedin" href="https://Linkedin.com">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width={20}
-                    height={20}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-linkedin"
-                  >
-                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                    <rect width={4} height={12} x={2} y={9} />
-                    <circle cx={4} cy={4} r={2} />
-                  </svg>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="text-muted-foreground-subtle container border-x border-t border-b py-4 text-sm tracking-[-0.28px] lg:py-8">
+        <div className="flex items-center justify-between text-muted-foreground-subtle container border-x border-t border-b py-4 text-sm tracking-[-0.28px] lg:py-8">
           <p>
             © {/* */}2025{/* */} Relative. All rights reserved.
           </p>
         </div>
-        <div className="container h-6 border-x" />
+        <div className="container h-6 border-x flex items-center justify-center">
+          <h1>
+            Design and development by{" "}
+            <a href="https://vickytajpuriya.com" target="_blank">
+              Vicky Tajpuriya
+            </a>
+          </h1>
+        </div>
       </footer>
     </>
   );
