@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   useDeleteLoginsMutation,
@@ -82,7 +82,23 @@ interface VaultData {
   authtoken: boolean;
 }
 
-const View = ({ logins }: { logins: VaultData[] }) => {
+const View = ({
+  logins,
+  refetch,
+  loading,
+  setLoading,
+  page,
+  setPage,
+  hasMore,
+}: {
+  logins: VaultData[];
+  refetch: any;
+  loading: boolean;
+  setLoading: any;
+  page: number;
+  setPage: any;
+  hasMore: boolean;
+}) => {
   const { accessToken } = useAuthUser();
   const [slug, setSlug] = useState("");
   const [data_type, setType] = useState<"note" | "login" | "wallet">("login");
@@ -90,6 +106,14 @@ const View = ({ logins }: { logins: VaultData[] }) => {
   const [appauth, setAppauth] = useState(false);
   const [verified, setVerified] = useState(false);
   const [progress, setProgress] = useState(0);
+
+  const loadMoreProducts = useCallback(async () => {
+    if (hasMore && !loading) {
+      setLoading(true);
+      await delay(1000);
+      setPage((prev: number) => prev + 1);
+    }
+  }, [hasMore, loading, page]);
 
   useEffect(() => {
     if (sec || !slug) return;
@@ -173,9 +197,9 @@ const View = ({ logins }: { logins: VaultData[] }) => {
       return (
         slug &&
         (data_type == "login" ? (
-          <ContentData slug={slug} />
+          <ContentData slug={slug} listrefetch={refetch} />
         ) : (
-          <NoteView slug={slug} />
+          <NoteView slug={slug} refetch={refetch} />
         ))
       );
     }
@@ -183,7 +207,7 @@ const View = ({ logins }: { logins: VaultData[] }) => {
 
   return (
     <div className="relative w-full h-dvh flex">
-      <div className="relative w-[50%] h-full border-r py-1">
+      <div className="relative w-[50%] h-full  border-r py-1">
         <div className="flex gap-2 px-1 mt-2">
           <Select defaultValue="1">
             <SelectTrigger className="w-auto max-w-full min-w-48">
@@ -248,55 +272,70 @@ const View = ({ logins }: { logins: VaultData[] }) => {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex flex-col mt-3">
-          {logins.map((data) => (
-            <div
-              onClick={() => {
-                ToggleData({
-                  data_type: data.username ? "login" : "note",
-                  slug: data.slug,
-                  sec: data.security,
-                  authtoken: data.authtoken,
-                });
-              }}
-              key={data.slug}
-              className={cn(
-                "flex h-14 w-full  p-2 gap-5 cursor-pointer",
-                slug == data.slug && "dark:bg-neutral-800/50 bg-neutral-200/50",
-              )}
-            >
-              {data.username ? (
-                <Website
-                  avatarProps={{
-                    name: `${data.username.slice(0, 1)}`,
-                    classNames: {
-                      base: "bg-gradient-to-br from-[#FFB457] to-[#FF705B] cursor-pointer",
-                      icon: "text-black/80",
-                    },
-                  }}
-                  classNames={{
-                    description: "text-default-500",
-                    name: "cursor-pointer",
-                  }}
-                  name={data.title}
-                />
-              ) : (
-                <Avatar>
-                  <AvatarFallback className="bg-transparent">
-                    <File className="w-6 h-6 stroke-white" />
-                  </AvatarFallback>
-                </Avatar>
-              )}
-              <div className="text-left cursor-pointer">
-                <span className="flex items-center gap-x-1 flex-nowrap">
-                  <span className="text-ellipsis">{data.title}</span>
-                </span>
-                <div className="dark:text-neutral-300 block text-xs text-ellipsis">
-                  {data.username}
+        <div className="flex flex-col mt-3 h-[92dvh] overflow-y-auto">
+          <InfiniteScroll
+            loading={loading}
+            hasMore={hasMore}
+            loadMore={loadMoreProducts}
+            className="w-full"
+          >
+            {logins.map((data) => (
+              <div
+                onClick={() => {
+                  ToggleData({
+                    data_type: data.username ? "login" : "note",
+                    slug: data.slug,
+                    sec: data.security,
+                    authtoken: data.authtoken,
+                  });
+                }}
+                key={data.slug}
+                className={cn(
+                  "flex h-14 w-full  p-2 gap-5 cursor-pointer",
+                  slug == data.slug &&
+                    "dark:bg-neutral-800/50 bg-neutral-200/50",
+                )}
+              >
+                {data.username ? (
+                  <Website
+                    avatarProps={{
+                      name: `${data.username.slice(0, 1)}`,
+                      classNames: {
+                        base: "bg-gradient-to-br from-[#FFB457] to-[#FF705B] cursor-pointer",
+                        icon: "text-black/80",
+                      },
+                    }}
+                    classNames={{
+                      description: "text-default-500",
+                      name: "cursor-pointer",
+                    }}
+                    name={data.title}
+                  />
+                ) : (
+                  <Avatar>
+                    <AvatarFallback className="bg-transparent">
+                      <File className="w-6 h-6 stroke-white" />
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+                <div
+                  className={cn(
+                    "text-left cursor-pointer",
+                    !data.username && "items-center flex",
+                  )}
+                >
+                  <span className="flex items-center gap-x-1 flex-nowrap">
+                    <span className="text-ellipsis">{data.title}</span>
+                  </span>
+                  {data.username && (
+                    <div className="dark:text-neutral-300 block text-xs text-ellipsis">
+                      {data.username}
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </InfiniteScroll>
         </div>
       </div>
       <div className="relative w-[50%] h-full py-1">{renderContent()}</div>
@@ -320,6 +359,7 @@ import { toast } from "sonner";
 import { delay } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import InfiniteScroll from "@/components/global/infinite-scroll";
 
 const vaultPasswordSchema = z.object({
   vaultpassword: z

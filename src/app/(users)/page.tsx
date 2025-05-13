@@ -51,8 +51,8 @@ export default function Home() {
               Say Goodbye to Task Overload
             </h1>
             <p className="text-muted-foreground mx-auto mt-5 max-w-[500px] leading-[1.5] tracking-[-0.32px] md:mt-6">
-              Prioritize, automate, and stay ahead—AI simplifies your tasks so
-              you can focus on what matters most.
+              Securely manage, generate, and organize your passwords with ease.
+              Built for speed, privacy, and total control.
             </p>
             <Link
               className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-zinc-600 h-9 px-4 py-2 mt-6 gap-1 md:mt-8 lg:mt-10"
@@ -116,7 +116,7 @@ export default function Home() {
               alt="Hero"
               width={1000}
               height={600}
-              className="mx-auto rounded-xl border object-contain p-1 shadow-lg 2xl:max-w-[1092px] "
+              className="mx-auto p-2 rounded-xl border object-contain p-1 shadow-lg 2xl:max-w-[1092px] "
               style={{ color: "transparent" }}
             />
           </div>
@@ -150,7 +150,7 @@ export default function Home() {
               data-nimg={1}
               className="object-contain"
               style={{ color: "transparent" }}
-              src="/images/partners/notion.svg"
+              src="/media/tech/next.svg"
             />
           </div>
           <div className="flex items-center justify-center">
@@ -163,7 +163,7 @@ export default function Home() {
               data-nimg={1}
               className="object-contain"
               style={{ color: "transparent" }}
-              src="/images/partners/github.svg"
+              src="/media/tech/Django.svg"
             />
           </div>
           <div className="flex items-center justify-center">
@@ -176,7 +176,7 @@ export default function Home() {
               data-nimg={1}
               className="object-contain"
               style={{ color: "transparent" }}
-              src="/images/partners/slack.svg"
+              src="/media/tech/mysql.svg"
             />
           </div>
           <div className="flex items-center justify-center">

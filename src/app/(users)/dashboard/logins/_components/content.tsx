@@ -4,7 +4,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import {
   useGetLoginsQuery,
   useGetLoggedUserQuery,
-  useDeleteLoginsMutation,
+  useTrashLoginsMutation,
   useSetvaultpasswordMutation,
 } from "@/lib/store/api/api";
 import { useDecryptedData } from "@/hooks/dec-data";
@@ -109,9 +109,10 @@ const defaultFormValues: FormValues = {
 
 interface ViewLoginProps {
   slug: string;
+  reload: any;
 }
 
-const ContentData = ({ slug }: ViewLoginProps) => {
+const ContentData = ({ slug, reload }: ViewLoginProps) => {
   const { accessToken } = useAuthUser();
   const {
     data: encryptedData,
@@ -119,7 +120,7 @@ const ContentData = ({ slug }: ViewLoginProps) => {
     isLoading,
     refetch,
   } = useGetLoginsQuery({ slug, token: accessToken }, { skip: !slug });
-  const [deleteLogins] = useDeleteLoginsMutation();
+  const [trashLogins] = useTrashLoginsMutation();
   const [setvault] = useSetvaultpasswordMutation();
   const { data, loading } = useDecryptedData(encryptedData, isLoading);
   const [update, setUpdate] = useState<boolean>(false);
@@ -262,6 +263,35 @@ const ContentData = ({ slug }: ViewLoginProps) => {
       console.error("Error:", error);
     }
   }, []);
+
+  const onTrash = async () => {
+    if (!accessToken) return;
+    const toastId = toast.loading("Updating...", { position: "top-center" });
+    await delay(500);
+    toast.success("Moving to Trash..", {
+      id: toastId,
+      position: "top-center",
+    });
+    await delay(500);
+    try {
+      const response = await trashLogins({ slug, token: accessToken });
+      if (response.data) {
+        reset();
+        toast.success("Moved", {
+          id: toastId,
+          position: "top-center",
+        });
+        reload();
+      } else {
+        toast.error("Something went wrong", {
+          id: toastId,
+          position: "top-center",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   return (
     <Form {...form}>
@@ -635,37 +665,19 @@ const ContentData = ({ slug }: ViewLoginProps) => {
           <Button
             type="button"
             variant="secondary"
-            className="absolute right-10 top-2"
+            className="absolute right-20 top-2"
             onClick={() => setUpdate(true)}
           >
             Edit
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                size={"icon"}
-                type="button"
-                variant="secondary"
-                className="absolute right-0 top-2"
-              >
-                <EllipsisVertical />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>
-                <Pin className="w-4 h-4 rotate-45" />
-                Pin item
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Trash className="w-4 h-4" />
-                Move to Trash
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <EyeOff className="w-4 h-4" />
-                Exclude from monitoring
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            type="button"
+            variant="secondary"
+            className="absolute right-1 top-2"
+            onClick={() => onTrash()}
+          >
+            Trash
+          </Button>
         </>
       )}
     </Form>

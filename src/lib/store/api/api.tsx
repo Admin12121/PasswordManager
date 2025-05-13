@@ -137,6 +137,13 @@ export const userAuthapi = createApi({
         headers: createHeaders(token),
       }),
     }),
+    getTrashData: builder.query({
+      query: ({ slug, search, page_size, page, exclude_by, token }) => ({
+        url: `/api/vault/all/trash/${buildQueryParams({ search, page_size, page, exclude_by })}`,
+        method: "GET",
+        headers: createHeaders(token),
+      }),
+    }),
     getLogins: builder.query({
       query: ({ slug, search, page_size, page, exclude_by, token }) => ({
         url: `/api/vault/logins/${slug ? `${slug}/` : ""}${buildQueryParams({ search, page_size, page, exclude_by })}`,
@@ -155,6 +162,20 @@ export const userAuthapi = createApi({
       query: ({ token, slug }) => ({
         url: `/api/vault/logins/${slug ? `${slug}/` : ""}`,
         method: "PATCH",
+        headers: createHeaders(token),
+      }),
+    }),
+    trashLogins: builder.mutation({
+      query: ({ slug, token }) => ({
+        url: `/api/vault/logins/${slug ? `${slug}/` : ""}trash/`,
+        method: "DELETE",
+        headers: createHeaders(token),
+      }),
+    }),
+    recoverLogins: builder.mutation({
+      query: ({ slug, token }) => ({
+        url: `/api/vault/logins/${slug ? `${slug}/` : ""}recover/`,
+        method: "DELETE",
         headers: createHeaders(token),
       }),
     }),
@@ -186,6 +207,13 @@ export const userAuthapi = createApi({
         headers: createHeaders(token),
       }),
     }),
+    recoverNotes: builder.mutation({
+      query: ({ slug, token }) => ({
+        url: `/api/vault/notes/${slug ? `${slug}/` : ""}recover/`,
+        method: "DELETE",
+        headers: createHeaders(token),
+      }),
+    }),
     deleteNotes: builder.mutation({
       query: ({ slug, token }) => ({
         url: `/api/vault/notes/${slug ? `${slug}/` : ""}`,
@@ -209,12 +237,16 @@ export const {
   useChangeUserPasswordMutation,
   useRefreshTokenMutation,
   useGetAllDataQuery,
+  useGetTrashDataQuery,
   useGetLoginsQuery,
   useGetVaultQuery,
   useUpdateLoginsMutation,
+  useTrashLoginsMutation,
+  useRecoverLoginsMutation,
   useDeleteLoginsMutation,
   useGetNotesQuery,
   useUpdateNotesMutation,
   useTrashNotesMutation,
+  useRecoverNotesMutation,
   useDeleteNotesMutation,
 } = userAuthapi;

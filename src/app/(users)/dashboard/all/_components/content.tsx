@@ -109,9 +109,10 @@ const defaultFormValues: FormValues = {
 
 interface ViewLoginProps {
   slug: string;
+  listrefetch: any;
 }
 
-const ContentData = ({ slug }: ViewLoginProps) => {
+const ContentData = ({ slug, listrefetch }: ViewLoginProps) => {
   const { accessToken } = useAuthUser();
   const {
     data: encryptedData,

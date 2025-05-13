@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   useDeleteLoginsMutation,
@@ -84,10 +84,22 @@ const View = ({
   logins,
   isNew,
   setIsNew,
+  refetch,
+  loading,
+  setLoading,
+  page,
+  setPage,
+  hasMore,
 }: {
   logins: VaultData[];
   isNew: boolean;
   setIsNew: any;
+  refetch: any;
+  loading: boolean;
+  setLoading: any;
+  page: number;
+  setPage: any;
+  hasMore: boolean;
 }) => {
   const { accessToken } = useAuthUser();
   const [slug, setSlug] = useState("");
@@ -95,6 +107,14 @@ const View = ({
   const [appauth, setAppauth] = useState(false);
   const [verified, setVerified] = useState(false);
   const [progress, setProgress] = useState(0);
+
+  const loadMoreProducts = useCallback(async () => {
+    if (hasMore && !loading) {
+      setLoading(true);
+      await delay(1000);
+      setPage((prev: number) => prev + 1);
+    }
+  }, [hasMore, loading, page]);
 
   useEffect(() => {
     if (sec || !slug) return;
@@ -137,7 +157,7 @@ const View = ({
 
   const renderContent = () => {
     if (isNew) {
-      return <LoginForm className="lg:flex-col p-3" />;
+      return <LoginForm className="lg:flex-col p-3" refetch={refetch} />;
     }
     if (!slug) {
       return (
@@ -176,7 +196,7 @@ const View = ({
         </LogoAnimation>
       );
     } else {
-      return slug && <ContentData slug={slug} />;
+      return slug && <ContentData slug={slug} reload={refetch} />;
     }
   };
 
@@ -217,45 +237,53 @@ const View = ({
           </Select>
         </div>
         <div className="flex flex-col mt-3">
-          {logins.map((data) => (
-            <div
-              onClick={() => {
-                ToggleData({
-                  slug: data.slug,
-                  sec: data.security,
-                  authtoken: data.authtoken,
-                });
-              }}
-              key={data.slug}
-              className={cn(
-                "flex h-14 w-full  p-2 gap-5 cursor-pointer",
-                slug == data.slug && "dark:bg-neutral-800/50 bg-neutral-200/50",
-              )}
-            >
-              <Website
-                avatarProps={{
-                  name: `${data.username.slice(0, 1)}`,
-                  classNames: {
-                    base: "bg-gradient-to-br from-[#FFB457] to-[#FF705B] cursor-pointer",
-                    icon: "text-black/80",
-                  },
+          <InfiniteScroll
+            loading={loading}
+            hasMore={hasMore}
+            loadMore={loadMoreProducts}
+            className="w-full"
+          >
+            {logins.map((data) => (
+              <div
+                onClick={() => {
+                  ToggleData({
+                    slug: data.slug,
+                    sec: data.security,
+                    authtoken: data.authtoken,
+                  });
                 }}
-                classNames={{
-                  description: "text-default-500",
-                  name: "cursor-pointer",
-                }}
-                name={data.title}
-              />
-              <div className="text-left cursor-pointer">
-                <span className="flex items-center gap-x-1 flex-nowrap">
-                  <span className="text-ellipsis">{data.title}</span>
-                </span>
-                <div className="dark:text-neutral-300 block text-xs text-ellipsis">
-                  {data.username}
+                key={data.slug}
+                className={cn(
+                  "flex h-14 w-full  p-2 gap-5 cursor-pointer",
+                  slug == data.slug &&
+                    "dark:bg-neutral-800/50 bg-neutral-200/50",
+                )}
+              >
+                <Website
+                  avatarProps={{
+                    name: `${data.username.slice(0, 1)}`,
+                    classNames: {
+                      base: "bg-gradient-to-br from-[#FFB457] to-[#FF705B] cursor-pointer",
+                      icon: "text-black/80",
+                    },
+                  }}
+                  classNames={{
+                    description: "text-default-500",
+                    name: "cursor-pointer",
+                  }}
+                  name={data.title}
+                />
+                <div className="text-left cursor-pointer">
+                  <span className="flex items-center gap-x-1 flex-nowrap">
+                    <span className="text-ellipsis">{data.title}</span>
+                  </span>
+                  <div className="dark:text-neutral-300 block text-xs text-ellipsis">
+                    {data.username}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </InfiniteScroll>
         </div>
       </div>
       <div className="relative w-[50%] h-full py-1">{renderContent()}</div>
@@ -280,6 +308,7 @@ import { delay } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import LoginForm from "./add_login";
+import InfiniteScroll from "@/components/global/infinite-scroll";
 
 const vaultPasswordSchema = z.object({
   vaultpassword: z

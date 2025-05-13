@@ -8,6 +8,7 @@ import {
   useGetNotesQuery,
   useVerifyvaultpasswordMutation,
   useGetLoggedUserQuery,
+  useTrashNotesMutation,
   useSetvaultpasswordMutation,
 } from "@/lib/store/api/api";
 import { items } from "@/components/global/sites";
@@ -127,9 +128,10 @@ const defaultVaultPasswordValues: VaultPassword = {
   vaultpassword: "",
 };
 
-const NoteView = ({ slug }: { slug: string }) => {
+const NoteView = ({ slug, refetch }: { slug: string; refetch: any }) => {
   const { accessToken } = useAuthUser();
   const [user, setUser] = useState<UserData>();
+  const [trash] = useTrashNotesMutation();
   const [editing, setEditing] = useState(true);
   const [setvault] = useSetvaultpasswordMutation();
 
@@ -246,6 +248,38 @@ const NoteView = ({ slug }: { slug: string }) => {
       console.error("Error:", error);
     }
   }, []);
+
+  const onTrash = async () => {
+    if (!accessToken) return;
+    const toastId = toast.loading("Updating...", { position: "top-center" });
+    await delay(500);
+    toast.success("Moving to Trash..", {
+      id: toastId,
+      position: "top-center",
+    });
+    await delay(500);
+    try {
+      const response = await trash({ slug, token: accessToken });
+      if (response.data) {
+        reset();
+        toast.success("Moved", {
+          id: toastId,
+          position: "top-center",
+        });
+        refetch();
+        if (editor) {
+          editor.commands.setContent("");
+        }
+      } else {
+        toast.error("Something went wrong", {
+          id: toastId,
+          position: "top-center",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const onUpdate = async () => {
     const olddata = getValues();
@@ -409,7 +443,7 @@ const NoteView = ({ slug }: { slug: string }) => {
               <Button
                 type="button"
                 variant="secondary"
-                // onClick={() => toggleEdit(true)}
+                onClick={() => onTrash()}
                 className="hover:text-white w-full"
               >
                 Trash

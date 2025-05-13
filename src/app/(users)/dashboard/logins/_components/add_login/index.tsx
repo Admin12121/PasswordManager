@@ -91,10 +91,12 @@ const LoginForm = ({
   className,
   submitButton,
   security,
+  refetch,
 }: {
   className?: string;
   submitButton?: string;
   security?: string;
+  refetch: any;
 }) => {
   const router = useRouter();
   const { accessToken } = useAuthUser();
@@ -150,6 +152,7 @@ const LoginForm = ({
         if (response.ok) {
           const res = await response.json();
           reset();
+          refetch();
           toast.success("Added SuccessFull", {
             id: toastId,
             position: "top-center",

@@ -66,6 +66,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TrashIcon } from "@radix-ui/react-icons";
+import InfiniteScroll from "@/components/global/infinite-scroll";
 
 const CustomDocument = Document.extend({
   content: "heading block*",
@@ -124,11 +125,21 @@ const View = ({
   refetch,
   isNew,
   setIsNew,
+  loading,
+  setLoading,
+  page,
+  setPage,
+  hasMore,
 }: {
   notes: VaultData[];
   refetch: any;
   isNew: boolean;
   setIsNew: any;
+  loading: boolean;
+  setLoading: any;
+  page: number;
+  setPage: any;
+  hasMore: boolean;
 }) => {
   const { accessToken, user } = useAuthUser();
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
@@ -137,6 +148,14 @@ const View = ({
   const [verified, setVerified] = useState(false);
   const [progress, setProgress] = useState(0);
   const [veruser, setVerUser] = useState<UserData>();
+
+  const loadMoreProducts = useCallback(async () => {
+    if (hasMore && !loading) {
+      setLoading(true);
+      await delay(1000);
+      setPage((prev: number) => prev + 1);
+    }
+  }, [hasMore, loading, page]);
 
   useEffect(() => {
     if (sec || !selectedSlug) return;
@@ -155,7 +174,7 @@ const View = ({
     return () => clearInterval(interval);
   }, [selectedSlug, sec]);
 
-  const handleVerification = ({ slug }: { slug: string }) => {
+  const handleVerification = () => {
     setVerified(true);
     setSec(false);
   };
@@ -288,40 +307,47 @@ const View = ({
           </Select>
         </div>
         <div className="flex flex-col mt-3">
-          {notes.map((data) => (
-            <div
-              onClick={() => {
-                handleSelectNote({
-                  slug: data.slug,
-                  sec: data.security,
-                  authtoken: data.authtoken,
-                });
-              }}
-              key={data.slug}
-              className={cn(
-                "flex h-14 w-full  p-2 gap-5 cursor-pointer",
-                selectedSlug == data.slug &&
-                  "dark:bg-neutral-800/50 bg-neutral-200/50",
-              )}
-            >
+          <InfiniteScroll
+            loading={loading}
+            hasMore={hasMore}
+            loadMore={loadMoreProducts}
+            className="w-full"
+          >
+            {notes.map((data) => (
               <div
+                onClick={() => {
+                  handleSelectNote({
+                    slug: data.slug,
+                    sec: data.security,
+                    authtoken: data.authtoken,
+                  });
+                }}
+                key={data.slug}
                 className={cn(
-                  "flex gap-2 bg-neutral-950 w-10 h-full items-center justify-center rounded-xl",
+                  "flex h-14 w-full  p-2 gap-5 cursor-pointer",
+                  selectedSlug == data.slug &&
+                    "dark:bg-neutral-800/50 bg-neutral-200/50",
                 )}
               >
-                <Avatar>
-                  <AvatarFallback className="bg-transparent">
-                    <File className="w-6 h-6 stroke-white" />
-                  </AvatarFallback>
-                </Avatar>
+                <div
+                  className={cn(
+                    "flex gap-2 bg-neutral-950 w-10 h-full items-center justify-center rounded-xl",
+                  )}
+                >
+                  <Avatar>
+                    <AvatarFallback className="bg-transparent">
+                      <File className="w-6 h-6 stroke-white" />
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                <div className="text-left flex items-center cursor-pointer">
+                  <span className="flex items-center gap-x-1 flex-nowrap">
+                    <span className="text-ellipsis">{data.title}</span>
+                  </span>
+                </div>
               </div>
-              <div className="text-left flex items-center cursor-pointer">
-                <span className="flex items-center gap-x-1 flex-nowrap">
-                  <span className="text-ellipsis">{data.title}</span>
-                </span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </InfiniteScroll>
         </div>
       </div>
       <div className="relative w-[50%] h-full py-1">{renderContent()}</div>
@@ -359,7 +385,7 @@ const VerifyVaultSecurity = ({
   const handleVerify = async (data: VaultPassword) => {
     const res = await verify({ data, token: token });
     if (res.data) {
-      onSuccess(slug);
+      onSuccess();
       toast.success("Verified successfull", {
         position: "top-center",
       });

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useGetVaultQuery } from "@/lib/store/api/api";
+import { useGetTrashDataQuery } from "@/lib/store/api/api";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
@@ -32,28 +32,28 @@ const ViewAll = () => {
   const [page, setPage] = useState<number>(1);
   const [exclude_by, SetExcludeBy] = useState<string>("");
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [loading, setLoading] = useState(false);
   const {
     data: encryptedData,
     isLoading,
     refetch,
-  } = useGetVaultQuery(
+  } = useGetTrashDataQuery(
     { search, page_size: rowsperpage, page, exclude_by, token: accessToken },
     { skip: !accessToken },
   );
   const { data } = useDecryptedData(encryptedData, isLoading);
-  const [logins, setLogins] = useState<VaultData[]>([]);
-
-  useEffect(() => {
-    if (encryptedData) {
-      refetch();
-    }
-  }, []);
+  const [trash, setTrash] = useState<VaultData[]>([]);
 
   useEffect(() => {
     if (data) {
-      setLogins(data.results);
+      setTrash((prev) =>
+        page === 1 ? data.results : [...(prev || []), ...data.results],
+      );
+      setHasMore(Boolean(data.links.next));
+      setLoading(false);
     }
-  }, [data, page, exclude_by]);
+  }, [data]);
 
   useEffect(() => {
     if (search) {
@@ -94,7 +94,15 @@ const ViewAll = () => {
           </div>
         </div>
       </div>
-      <View logins={logins} />
+      <View
+        logins={trash}
+        refetch={refetch}
+        loading={loading}
+        setLoading={setLoading}
+        page={page}
+        setPage={setPage}
+        hasMore={hasMore}
+      />
     </div>
   );
 };

@@ -25,6 +25,8 @@ const ViewAll = () => {
   const [page, setPage] = useState<number>(1);
   const [exclude_by, SetExcludeBy] = useState<string>("");
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [loading, setLoading] = useState(false);
   const {
     data: encryptedData,
     isLoading,
@@ -38,16 +40,14 @@ const ViewAll = () => {
   const [isNew, setisNew] = useState<boolean>(false);
 
   useEffect(() => {
-    if (encryptedData) {
-      refetch();
-    }
-  }, []);
-
-  useEffect(() => {
     if (data) {
-      setNotes(data.results);
+      setNotes((prev) =>
+        page === 1 ? data.results : [...(prev || []), ...data.results],
+      );
+      setHasMore(Boolean(data.links.next));
+      setLoading(false);
     }
-  }, [data, page, exclude_by]);
+  }, [data]);
 
   useEffect(() => {
     if (search) {
@@ -97,7 +97,17 @@ const ViewAll = () => {
           </Button>
         </div>
       </div>
-      <View notes={notes} refetch={refetch} isNew={isNew} setIsNew={setisNew} />
+      <View
+        notes={notes}
+        refetch={refetch}
+        isNew={isNew}
+        setIsNew={setisNew}
+        loading={loading}
+        setLoading={setLoading}
+        page={page}
+        setPage={setPage}
+        hasMore={hasMore}
+      />
     </div>
   );
 };

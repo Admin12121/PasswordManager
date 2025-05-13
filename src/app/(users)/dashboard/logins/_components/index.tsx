@@ -26,12 +26,14 @@ const ViewAll = () => {
   const [search, setSearch] = useState<string>("");
   const [rowsperpage, setRowsPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [exclude_by, SetExcludeBy] = useState<string>("");
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const {
     data: encryptedData,
-    isLoading,
     refetch,
+    isLoading,
   } = useGetVaultQuery(
     { search, page_size: rowsperpage, page, exclude_by, token: accessToken },
     { skip: !accessToken },
@@ -41,16 +43,14 @@ const ViewAll = () => {
   const [isNew, setIsNew] = useState<boolean>(false);
 
   useEffect(() => {
-    if (encryptedData) {
-      refetch();
-    }
-  }, []);
-
-  useEffect(() => {
     if (data) {
-      setLogins(data.results);
+      setLogins((prev) =>
+        page === 1 ? data.results : [...(prev || []), ...data.results],
+      );
+      setHasMore(Boolean(data.links.next));
+      setLoading(false);
     }
-  }, [data, page, exclude_by]);
+  }, [data]);
 
   useEffect(() => {
     if (search) {
@@ -100,7 +100,17 @@ const ViewAll = () => {
           </Button>
         </div>
       </div>
-      <View logins={logins} isNew={isNew} setIsNew={setIsNew} />
+      <View
+        logins={logins}
+        isNew={isNew}
+        setIsNew={setIsNew}
+        refetch={refetch}
+        loading={loading}
+        setLoading={setLoading}
+        page={page}
+        setPage={setPage}
+        hasMore={hasMore}
+      />
     </div>
   );
 };

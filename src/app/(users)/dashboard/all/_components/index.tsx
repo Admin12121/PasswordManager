@@ -32,6 +32,8 @@ const ViewAll = () => {
   const [rowsperpage, setRowsPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
   const [exclude_by, SetExcludeBy] = useState<string>("");
+  const [hasMore, setHasMore] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const {
     data: encryptedData,
@@ -42,19 +44,17 @@ const ViewAll = () => {
     { skip: !accessToken },
   );
   const { data } = useDecryptedData(encryptedData, isLoading);
-  const [logins, setLogins] = useState<VaultData[]>([]);
-
-  useEffect(() => {
-    if (encryptedData) {
-      refetch();
-    }
-  }, []);
+  const [alldata, setAllData] = useState<VaultData[]>([]);
 
   useEffect(() => {
     if (data) {
-      setLogins(data.results);
+      setAllData((prev) =>
+        page === 1 ? data.results : [...(prev || []), ...data.results],
+      );
+      setHasMore(Boolean(data.links.next));
+      setLoading(false);
     }
-  }, [data, page, exclude_by]);
+  }, [data]);
 
   useEffect(() => {
     if (search) {
@@ -129,8 +129,15 @@ const ViewAll = () => {
           </DropdownMenu>
         </div>
       </div>
-      {data && data.count == 0 && <Empty />}
-      {data && data.count > 0 && <View logins={logins} />}
+      <View
+        logins={alldata}
+        refetch={refetch}
+        loading={loading}
+        setLoading={setLoading}
+        page={page}
+        setPage={setPage}
+        hasMore={hasMore}
+      />
     </div>
   );
 };
