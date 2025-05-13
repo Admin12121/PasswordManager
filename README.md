@@ -3,6 +3,10 @@
 Welcome to the **Password Manager** project! This application is a secure and robust password management tool built using **Next.js** for the frontend and **Django** for the backend. It leverages **RSA encryption** and multiple layers of security to ensure that your sensitive data is fully encrypted and stored in a highly secure environment. Users can also log in conveniently using their social accounts like **GitHub** or **Google**.
 
 
+| Preview                                       |
+| --------------------------------------------- |
+| <img src="public/media/dashboard.png" alt="starship" width="1100"/> |
+
 ---
 
 ## Features
@@ -22,3 +26,7 @@ Welcome to the **Password Manager** project! This application is a secure and ro
 ### 🛡️ **Vault**
 - A secure vault where users can store and manage their passwords.
 - Fully encrypted data storage ensures that even the developers cannot access your sensitive information.
+
+
+## Author (Admin12121)
+- LinkedIn: [in/vickytajpuriya](https://www.linkedin.com/in/vickytajpuriya/)

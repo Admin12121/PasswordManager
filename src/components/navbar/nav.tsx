@@ -13,7 +13,6 @@ const Nav = () => {
     <header className="w-full relative z-50 border-b backdrop-blur-sm flex items-center justify-center">
       <div className="container">
         <div className="flex h-16 items-center justify-between">
-
           <Link className="flex items-center gap-1" href="/">
             <Image
               alt="logo"
@@ -33,21 +32,24 @@ const Nav = () => {
             <div className="transition-opacity duration-300 opacity-100">
               <ModeSwitcher showLabel variant="circle" start="bottom-right" />
             </div>
-             <div className="text-muted-foreground-subtle flex items-center justify-center">
-                <Link aria-label="Instagram" href="https://instagram.com">
-                  <Image
-                    alt="logo"
-                    loading="lazy"
-                    width={32}
-                    height={32}
-                    decoding="async"
-                    data-nimg={1}
-                    className=""
-                    style={{ color: "transparent" }}
-                    src="/media/tech/github.svg"
-                  />
-                </Link>
-              </div>
+            <div className="text-muted-foreground-subtle flex items-center justify-center">
+              <Link
+                aria-label="Instagram"
+                href="https://github.com/Admin12121/PasswordManager"
+              >
+                <Image
+                  alt="logo"
+                  loading="lazy"
+                  width={32}
+                  height={32}
+                  decoding="async"
+                  data-nimg={1}
+                  className=""
+                  style={{ color: "transparent" }}
+                  src="/media/tech/github.svg"
+                />
+              </Link>
+            </div>
             {status ? (
               <UserNav />
             ) : (
