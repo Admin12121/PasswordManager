@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   useRecoverLoginsMutation,
@@ -21,21 +21,11 @@ import {
   NotepadText,
   History,
   LayoutGrid,
-  CircleAlert,
   File,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useAuthUser } from "@/hooks/use-auth-user";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 interface SiteProps {
   avatarProps: {
@@ -109,6 +99,7 @@ const View = ({
   const [recoverlogins] = useRecoverLoginsMutation();
   const { accessToken, user } = useAuthUser();
   const [slug, setSlug] = useState<string>("");
+  const [type, setType] = useState<"logins" | "notes" | null>(null);
   const loadMoreProducts = useCallback(async () => {
     if (hasMore && !loading) {
       setLoading(true);
@@ -121,7 +112,7 @@ const View = ({
     if (!accessToken) return;
     const toastId = toast.loading("Updating...", { position: "top-center" });
     await delay(500);
-    toast.success("Recovering...", {
+    toast.loading("Recovering...", {
       id: toastId,
       position: "top-center",
     });
@@ -149,7 +140,7 @@ const View = ({
     if (!accessToken) return;
     const toastId = toast.loading("Updating...", { position: "top-center" });
     await delay(500);
-    toast.success("Recovering...", {
+    toast.loading("Recovering...", {
       id: toastId,
       position: "top-center",
     });
@@ -194,7 +185,7 @@ const View = ({
                   Login
                 </div>
               </SelectItem>
-              <SelectItem value="3">
+              <SelectItem value="3" disabled>
                 <div className="flex items-center gap-2">
                   <CreditCard className="w-4 h-4 opacity-60" />
                   Credit Card
@@ -272,7 +263,7 @@ const View = ({
                   />
                 ) : (
                   <Avatar>
-                    <AvatarFallback className="bg-transparent">
+                    <AvatarFallback className="bg-black dark:bg-transparent">
                       <File className="w-6 h-6 stroke-white" />
                     </AvatarFallback>
                   </Avatar>
@@ -303,7 +294,13 @@ const View = ({
                   >
                     Recover
                   </Button>
-                  <Button variant="outline" onClick={() => setSlug(data.slug)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSlug(data.slug);
+                      setType(data.username ? "logins" : "notes");
+                    }}
+                  >
                     Delete
                   </Button>
                 </div>
@@ -323,8 +320,11 @@ const View = ({
             {slug != "" && (
               <Firststep
                 token={accessToken}
+                slug={slug}
                 user={user?.email}
                 setSlug={setSlug}
+                type={type}
+                refetch={refetch}
               />
             )}
           </div>
@@ -367,13 +367,23 @@ const defaultTotpd: Totpd = {
 const Firststep = ({
   token,
   user,
+  slug,
   setSlug,
+  type,
+  refetch,
 }: {
   token?: string;
   user?: string | undefined | null;
+  slug: string;
   setSlug: any;
+  type: "logins" | "notes" | null;
+  refetch: any;
 }) => {
+  const [deleteLogins] = useDeleteLoginsMutation();
+  const [deleteNotes] = useDeleteNotesMutation();
+
   const [verify, setVerify] = useState<boolean>(false);
+
   const form = useForm<Totpd>({
     resolver: zodResolver(TotpSchema),
     mode: "onChange",
@@ -407,6 +417,72 @@ const Firststep = ({
       }
     } catch (error) {
       console.error("Error:", error);
+    }
+  };
+
+  const onDeletLogins = async () => {
+    if (!token) return;
+    const toastId = toast.loading("Updating...", { position: "top-center" });
+    await delay(500);
+    toast.loading("Deleting...", {
+      id: toastId,
+      position: "top-center",
+    });
+    await delay(500);
+    try {
+      const response = await deleteLogins({ slug, token });
+      if (response.data) {
+        setSlug("");
+        refetch();
+        toast.success("Deleted sucessfull", {
+          id: toastId,
+          position: "top-center",
+        });
+      } else {
+        toast.error("Something went wrong", {
+          id: toastId,
+          position: "top-center",
+        });
+      }
+    } catch {
+      console.log("error");
+    }
+  };
+
+  const onDeleteNotes = async () => {
+    if (!token) return;
+    const toastId = toast.loading("Updating...", { position: "top-center" });
+    await delay(500);
+    toast.loading("Deleting...", {
+      id: toastId,
+      position: "top-center",
+    });
+    await delay(500);
+    try {
+      const response = await deleteNotes({ slug, token });
+      if (response.data) {
+        setSlug("");
+        refetch();
+        toast.success("Deleted sucessfull", {
+          id: toastId,
+          position: "top-center",
+        });
+      } else {
+        toast.error("Something went wrong", {
+          id: toastId,
+          position: "top-center",
+        });
+      }
+    } catch {
+      console.log("error");
+    }
+  };
+
+  const deleteData = () => {
+    if (type == "logins") {
+      onDeletLogins();
+    } else {
+      onDeleteNotes();
     }
   };
 
@@ -475,6 +551,7 @@ const Firststep = ({
             <div className="flex gap-2 items-center justify-center w-full">
               <Button
                 variant={"secondary"}
+                onClick={() => deleteData()}
                 className="w-full dark:hover:text-white"
               >
                 detele

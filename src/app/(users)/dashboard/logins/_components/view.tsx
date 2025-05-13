@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  useDeleteLoginsMutation,
   useVerifyvaultpasswordMutation,
 } from "@/lib/store/api/api";
 import {
@@ -14,12 +13,7 @@ import {
 import { items } from "@/components/global/sites";
 import {
   ArrowUpDown,
-  CreditCard,
-  UserRound,
-  NotepadText,
   History,
-  LayoutGrid,
-  CircleAlert,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -157,7 +151,13 @@ const View = ({
 
   const renderContent = () => {
     if (isNew) {
-      return <LoginForm className="lg:flex-col p-3" refetch={refetch} />;
+      return (
+        <LoginForm
+          className="lg:flex-col p-3"
+          refetch={refetch}
+          setPage={setPage}
+        />
+      );
     }
     if (!slug) {
       return (

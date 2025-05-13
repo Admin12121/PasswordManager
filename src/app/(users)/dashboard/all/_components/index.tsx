@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useGetAllDataQuery } from "@/lib/store/api/api";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Empty from "./empty";
 const View = dynamic(() => import("./view"), { ssr: false });
 
 interface VaultData {
@@ -121,7 +120,7 @@ const ViewAll = () => {
                 />
                 Notes
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem disabled>
                 <Wallet size={16} className="opacity-60" aria-hidden="true" />
                 Wallet
               </DropdownMenuItem>

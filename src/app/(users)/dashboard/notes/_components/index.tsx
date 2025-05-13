@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useGetNotesQuery } from "@/lib/store/api/api";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { Button } from "@/components/ui/button";
-import dynamic from "next/dynamic";
 import { LoaderCircle } from "lucide-react";
 import { useDecryptedData } from "@/hooks/dec-data";
 import { Input } from "@/components/ui/input";

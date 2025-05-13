@@ -2,13 +2,12 @@
 
 import React, { useState, useCallback, useEffect } from "react";
 import {
-  useGetLoginsQuery,
   useGetLoggedUserQuery,
   useSetvaultpasswordMutation,
   useGetNotesQuery,
   useTrashNotesMutation,
 } from "@/lib/store/api/api";
-import { useEditor, Editor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Placeholder from "@tiptap/extension-placeholder";
 import StarterKit from "@tiptap/starter-kit";
@@ -77,9 +76,11 @@ const defaultFormValues: FormValues = {
 export default function NoteEditorPlaceholder({
   slug,
   refetch,
+  setPage,
 }: {
   slug: string;
   refetch: any;
+  setPage: any;
 }) {
   const { accessToken } = useAuthUser();
   const [setvault] = useSetvaultpasswordMutation();
@@ -248,11 +249,13 @@ export default function NoteEditorPlaceholder({
         body: JSON.stringify({ data: newData }),
       });
       if (response.ok) {
-        reset();
         toast.success("Saved", {
           id: toastId,
           position: "top-center",
         });
+        setPage(1);
+        await delay(500);
+        reset();
         refetch();
         if (editor) {
           editor.commands.setContent("");

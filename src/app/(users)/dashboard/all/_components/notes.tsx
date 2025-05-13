@@ -6,34 +6,11 @@ import StarterKit from "@tiptap/starter-kit";
 import { Button } from "@/components/ui/button";
 import {
   useGetNotesQuery,
-  useVerifyvaultpasswordMutation,
   useGetLoggedUserQuery,
   useTrashNotesMutation,
   useSetvaultpasswordMutation,
 } from "@/lib/store/api/api";
-import { items } from "@/components/global/sites";
-import {
-  ArrowUpDown,
-  CreditCard,
-  UserRound,
-  NotepadText,
-  History,
-  LayoutGrid,
-  CircleAlert,
-  File,
-  EllipsisIcon,
-  EllipsisVertical,
-  Pin,
-  Trash,
-  EyeOff,
-} from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
-import LogoAnimation, {
-  AnimatedNumber,
-} from "@/components/global/logo_animation";
 import { useAuthUser } from "@/hooks/use-auth-user";
-import { motion } from "framer-motion";
 import {
   Form,
   FormControl,
@@ -52,15 +29,6 @@ import { encryptData } from "@/hooks/dec-data";
 import { useDecryptedData } from "@/hooks/dec-data";
 import { UserData } from "@/schemas";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { TrashIcon } from "@radix-ui/react-icons";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
@@ -148,7 +116,6 @@ const NoteView = ({ slug, refetch }: { slug: string; refetch: any }) => {
   });
 
   const { reset, setValue, getValues, watch, formState, trigger } = form;
-  const { dirtyFields } = formState;
 
   const editor = useEditor({
     extensions: [

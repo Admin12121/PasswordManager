@@ -3,7 +3,6 @@ import {
   Settings,
   UserRound,
   NotepadText,
-  MapPin,
   Trash,
   LucideIcon,
   KeyRound,

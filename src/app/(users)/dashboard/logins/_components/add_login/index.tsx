@@ -92,11 +92,13 @@ const LoginForm = ({
   submitButton,
   security,
   refetch,
+  setPage,
 }: {
   className?: string;
   submitButton?: string;
   security?: string;
   refetch: any;
+  setPage: any;
 }) => {
   const router = useRouter();
   const { accessToken } = useAuthUser();
@@ -150,13 +152,14 @@ const LoginForm = ({
           body: JSON.stringify({ data: newData }),
         });
         if (response.ok) {
-          const res = await response.json();
-          reset();
-          refetch();
           toast.success("Added SuccessFull", {
             id: toastId,
             position: "top-center",
           });
+          setPage(1);
+          await delay(500);
+          reset();
+          refetch();
         } else {
           toast.error("Something went wrong", {
             id: toastId,

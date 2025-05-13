@@ -9,9 +9,7 @@ import { LoaderCircle } from "lucide-react";
 import { useDecryptedData } from "@/hooks/dec-data";
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
-import Empty from "./empty";
 const View = dynamic(() => import("./view"), { ssr: false });
-import LoginForm from "./add_login";
 
 interface VaultData {
   security: boolean;

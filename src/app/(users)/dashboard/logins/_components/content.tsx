@@ -20,9 +20,6 @@ import {
   Files,
   MailIcon,
   Globe,
-  EllipsisVertical,
-  Pin,
-  Trash,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,12 +45,6 @@ import Spinner from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { encryptData } from "@/hooks/dec-data";
 import { useAuthUser } from "@/hooks/use-auth-user";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { UserData } from "@/schemas";
 
 const formSchema = z.object({

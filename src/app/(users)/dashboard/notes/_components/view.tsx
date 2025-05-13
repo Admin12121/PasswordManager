@@ -1,11 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Document from "@tiptap/extension-document";
-import Placeholder from "@tiptap/extension-placeholder";
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import { Button } from "@/components/ui/button";
 import {
-  useGetNotesQuery,
   useVerifyvaultpasswordMutation,
   useGetLoggedUserQuery,
 } from "@/lib/store/api/api";
@@ -16,21 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { items } from "@/components/global/sites";
 import {
   ArrowUpDown,
-  CreditCard,
-  UserRound,
-  NotepadText,
   History,
-  LayoutGrid,
-  CircleAlert,
   File,
-  EllipsisIcon,
-  EllipsisVertical,
-  Pin,
-  Trash,
-  EyeOff,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -53,19 +38,8 @@ import { delay } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import NoteEditorPlaceholder from "./editor";
-import { encryptData } from "@/hooks/dec-data";
 import { useDecryptedData } from "@/hooks/dec-data";
 import { UserData } from "@/schemas";
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { TrashIcon } from "@radix-ui/react-icons";
 import InfiniteScroll from "@/components/global/infinite-scroll";
 
 const CustomDocument = Document.extend({
@@ -264,7 +238,11 @@ const View = ({
     } else {
       return (
         selectedSlug && (
-          <NoteEditorPlaceholder slug={selectedSlug} refetch={refetch} />
+          <NoteEditorPlaceholder
+            slug={selectedSlug}
+            refetch={refetch}
+            setPage={setPage}
+          />
         )
       );
     }

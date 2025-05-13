@@ -1,5 +1,4 @@
 import { FlickeringGrid } from "@/components/global/flickering";
-import Image from "next/image";
 import React from "react";
 
 const Dashboard = () => {

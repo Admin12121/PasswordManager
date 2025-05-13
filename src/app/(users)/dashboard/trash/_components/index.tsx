@@ -1,20 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useGetTrashDataQuery } from "@/lib/store/api/api";
 import { useAuthUser } from "@/hooks/use-auth-user";
-import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
-import { LoaderCircle, NotepadText, UserRound, Wallet } from "lucide-react";
+import { LoaderCircle, Search } from "lucide-react";
 import { useDecryptedData } from "@/hooks/dec-data";
 import { Input } from "@/components/ui/input";
-import { Plus, Search } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 const View = dynamic(() => import("./view"), { ssr: false });
 
 interface VaultData {

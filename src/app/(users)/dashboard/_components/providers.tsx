@@ -9,7 +9,6 @@ import {
 } from "@/components/global/sidebar";
 import { Links } from "./links";
 import { cn } from "@/lib/utils";
-import Header from "./header";
 import dynamic from "next/dynamic";
 
 const ThemeSwitch = dynamic(() => import("@/components/global/theme-switch"), {

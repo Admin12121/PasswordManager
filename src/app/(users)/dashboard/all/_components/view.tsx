@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  useDeleteLoginsMutation,
   useVerifyvaultpasswordMutation,
 } from "@/lib/store/api/api";
 import {
@@ -19,7 +18,6 @@ import {
   NotepadText,
   History,
   LayoutGrid,
-  CircleAlert,
   File,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -226,7 +224,7 @@ const View = ({
                   Login
                 </div>
               </SelectItem>
-              <SelectItem value="3">
+              <SelectItem value="3" disabled>
                 <div className="flex items-center gap-2">
                   <CreditCard className="w-4 h-4 opacity-60" />
                   Credit Card
@@ -313,7 +311,7 @@ const View = ({
                   />
                 ) : (
                   <Avatar>
-                    <AvatarFallback className="bg-transparent">
+                    <AvatarFallback className="bg-black dark:bg-transparent ">
                       <File className="w-6 h-6 stroke-white" />
                     </AvatarFallback>
                   </Avatar>
