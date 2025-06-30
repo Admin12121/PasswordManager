@@ -2,15 +2,25 @@
 
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { useRouter } from "nextjs-toploader/app";
 import Image from "next/image";
 import { Google } from "@/icons";
 import { Github } from "@/icons/github";
 import { signIn } from "next-auth/react";
 import { Default_Login_Redirect } from "@/routes";
+import { cn } from "@/lib/utils";
 
 const Login = () => {
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    console.log(searchParams)
+    if (searchParams.get("error")) {
+      setHasError(true);
+      console.log("found")
+    }
+  }, []);
+
   const onClick = async (provider: "google" | "github") => {
     signIn(provider, {
       callbackUrl: Default_Login_Redirect,
@@ -38,9 +48,9 @@ const Login = () => {
         <div className="flex flex-col items-center justify-center w-full gap-3">
           <Button
             size="lg"
-            className="w-full bg-neutral-700  hover:bg-neutral-900 dark:bg-neutral-900 text-white rounded-xl justify-start gap-5 px-2 h-16"
+            className={cn("w-full bg-neutral-700  hover:bg-neutral-900 dark:bg-neutral-900 text-white rounded-xl justify-start gap-5 px-2 h-16")}
             onClick={() => onClick("google")}
-          >
+            >
             <span className="bg-neutral-950 p-3 rounded-xl">
               <Google />
             </span>
@@ -48,9 +58,9 @@ const Login = () => {
           </Button>
           <Button
             size="lg"
-            className="w-full bg-neutral-700  hover:bg-neutral-900 dark:bg-neutral-900 text-white rounded-xl justify-start gap-5 px-2 h-16"
+            className={cn("w-full bg-neutral-700  hover:bg-neutral-900 dark:bg-neutral-900 text-white rounded-xl justify-start gap-5 px-2 h-16")}
             onClick={() => onClick("github")}
-          >
+            >
             <span className="bg-neutral-950 p-3 rounded-xl">
               <Github />
             </span>
@@ -58,7 +68,7 @@ const Login = () => {
           </Button>
         </div>
         <div className="mt-5 px-10 text-center">
-          <p>By Continue, you agree to our Term and Privacy Policy</p>
+          {hasError ? <p className="text-orange-500">Failed to login</p> : <p>By Continue, you agree to our Term and Privacy Policy</p>}
         </div>
       </div>
     </div>

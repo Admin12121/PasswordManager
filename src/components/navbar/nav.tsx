@@ -32,7 +32,7 @@ const Nav = () => {
             <div className="transition-opacity duration-300 opacity-100">
               <ModeSwitcher showLabel variant="circle" start="bottom-right" />
             </div>
-            <div className="text-muted-foreground-subtle flex items-center justify-center">
+            <div className="text-muted-foreground-subtle items-center justify-center hidden lg:flex">
               <Link
                 aria-label="Instagram"
                 href="https://github.com/Admin12121/PasswordManager"
@@ -54,7 +54,7 @@ const Nav = () => {
               <UserNav />
             ) : (
               <>
-                <span className="hidden lg:block">
+                <span className="block">
                   <Link
                     href="/auth/login"
                     className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 gap-1"
@@ -65,24 +65,6 @@ const Nav = () => {
                 </span>
               </>
             )}
-
-            <button className="text-muted-foreground relative flex h-8 w-8 lg:hidden">
-              <span className="sr-only">Open main menu</span>
-              <div className="absolute top-1/2 left-1/2 block w-[18px] -translate-x-1/2 -translate-y-1/2 transform">
-                <span
-                  aria-hidden="true"
-                  className="absolute block h-0.5 w-full transform rounded-full bg-current transition duration-500 ease-in-out -translate-y-1.5"
-                />
-                <span
-                  aria-hidden="true"
-                  className="absolute block h-0.5 w-full transform rounded-full bg-current transition duration-500 ease-in-out "
-                />
-                <span
-                  aria-hidden="true"
-                  className="absolute block h-0.5 w-full transform rounded-full bg-current transition duration-500 ease-in-out translate-y-1.5"
-                />
-              </div>
-            </button>
           </div>
         </div>
       </div>
