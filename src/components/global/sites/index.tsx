@@ -32,6 +32,21 @@ import {
     RiSkypeLine,
     RiNetflixLine,
     RiSpotifyLine,
+    RiBox3Line,
+    RiClaudeLine,
+    RiFirebaseLine,
+    RiOperaFill,
+    RiPatreonFill,
+    RiPerplexityFill,
+    RiProductHuntFill,
+    RiSupabaseFill,
+    RiThreadsLine,
+    RiTiktokLine,
+    RiSteamFill,
+    RiTwitchFill,
+    RiUnsplashFill,
+    RiVercelFill,
+    RiCloudWindyLine,
   } from "@remixicon/react";
   
   export const items = [
@@ -200,5 +215,80 @@ import {
       label: "Chrome",
       icon: RiChromeLine,
     },
+    {
+      Value: "https://hackthebox.com",
+      label: "Hack The Box",
+      icon: RiBox3Line,
+    },
+    {
+      value: "https://claude.ai",
+      label: "Claude",
+      icon: RiClaudeLine,
+    },
+    {
+      value: "https://firebase.google.com",
+      label: "Firebase",
+      icon: RiFirebaseLine,
+    },
+    {
+      value: "https://opera.com",
+      label: "Opera",
+      icon: RiOperaFill,
+    },
+    {
+      value: "https://patreon.com",
+      label: "Patreon",
+      icon: RiPatreonFill,
+    },
+    {
+      value: "https://perplexity.ai",
+      label: "Perplexity",
+      icon: RiPerplexityFill,
+    },
+    {
+      value: "https://producthunt.com",
+      label: "Product Hunt",
+      icon: RiProductHuntFill,
+    },
+    {
+      value: "https://supabase.com",
+      label: "Supabase",
+      icon: RiSupabaseFill,
+    },
+    {
+      value: "https://threads.net",
+      label: "Threads",
+      icon: RiThreadsLine,
+    },
+    {
+      value: "https://tiktok.com",
+      label: "TikTok",
+      icon: RiTiktokLine,
+    },
+    {
+      value: "https://steamcommunity.com",
+      label: "Steam",
+      icon: RiSteamFill,
+    },
+    {
+      value: "https://twitch.tv",
+      label: "Twitch",
+      icon: RiTwitchFill,
+    },
+    {
+      value: "https://unsplash.com",
+      label: "Unsplash",
+      icon: RiUnsplashFill,
+    },
+    {
+      value: "https://vercel.com",
+      label: "Vercel",
+      icon: RiVercelFill
+    },
+    {
+      value: "https://Tryhackme.com",
+      label: "TryHackMe",
+      icon: RiCloudWindyLine
+    }
   ];
   

@@ -37,6 +37,8 @@ import { encryptData } from "@/hooks/dec-data";
 import { useRouter } from "next/navigation";
 import { useDecryptedData } from "@/hooks/dec-data";
 import { UserData } from "@/schemas";
+import { items } from "@/components/global/sites";
+import { useRef } from "react";
 
 const formSchema = z.object({
   title: z
@@ -261,7 +263,28 @@ const LoginForm = ({
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Title" {...field} />
+                    <div className="relative">
+                      <Input
+                        placeholder="Title"
+                        {...field}
+                        list="site-titles"
+                        autoComplete="off"
+                        onChange={(e) => {
+                          field.onChange(e);
+                          const match = items.find(
+                            (item) => item.label.toLowerCase() === e.target.value.toLowerCase()
+                          );
+                          if (match && typeof match.value === "string") {
+                            setValue("website", match.value);
+                          }
+                        }}
+                      />
+                      <datalist id="site-titles">
+                        {items.map((item) => (
+                          <option key={item.value} value={item.label} />
+                        ))}
+                      </datalist>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
